@@ -7,7 +7,8 @@
  * This code is public domain. Feel free to use it for any purpose!
  */
 
-#include "core/game_object.hpp"
+#include "core/GameObject.hpp"
+#include "game/CircleBehaviour.hpp"
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_filesystem.h>
 #include <SDL3/SDL_init.h>
@@ -30,6 +31,7 @@ static SDL_Texture *texture = NULL;
 static SDL_Point texture_size = {0};
 
 GameObject *gameObject;
+Uint64 last = SDL_GetPerformanceCounter();
 
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
@@ -70,6 +72,10 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     // gameObject->Dimensions.w *= 2.0;
     // gameObject->Dimensions.h *= 2.0;
 
+    auto circleBehavior = new CircleBehaviour();
+
+    gameObject->AddChild(circleBehavior);
+
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
@@ -90,42 +96,17 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
-/* This function runs once per frame, and is the heart of the program. */
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
-    SDL_FRect rect;
+    Uint64 now = SDL_GetPerformanceCounter();
+    double deltaTime =
+        (double)(now - last) / (double)SDL_GetPerformanceFrequency();
+    last = now;
 
-
-    /* as you can see from this, rendering draws over whatever was drawn before it. */
-    SDL_SetRenderDrawColor(renderer, 0XFF, 33, 33, SDL_ALPHA_OPAQUE);  /* dark gray, full alpha */
+    SDL_SetRenderDrawColor(renderer, 15, 50, 90, SDL_ALPHA_OPAQUE);  /* dark gray, full alpha */
     SDL_RenderClear(renderer);  /* start with a blank canvas. */
 
-    const Uint64 now = SDL_GetTicks();
-    const float phase = (((float) ((int) (now % 2000))) / 2000.0f) * SDL_PI_F * 2;
-
-    /* draw a filled rectangle in the middle of the canvas. */
-    SDL_SetRenderDrawColor(renderer, 0, 0, 255, SDL_ALPHA_OPAQUE);  /* blue, full alpha */
-    rect.x = rect.y = 100;
-    rect.w = 440 + sin(phase) * 50;
-    rect.h = 280 + cos(phase) * 50;
-    SDL_RenderFillRect(renderer, &rect);
-
-    SDL_FRect destination_rect = {0};
-
-    destination_rect.x = 100;
-    destination_rect.y = 100;
-    destination_rect.w = texture_size.x;
-    destination_rect.h = texture_size.y;
-
-    // SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_PIXELART);
-
-    // SDL_RenderTexture(renderer, texture, NULL, NULL);
-
-    // gameObject->Dimensions.x = 100 + sin(phase) * 10;
-    // gameObject->Dimensions.y = 100 + cos(phase) * 10;
-    // gameObject->Dimensions.w = 200 + cos(phase) * 10;
-
-
+    gameObject->Update(deltaTime);
     gameObject->Draw(renderer);
 
     SDL_RenderPresent(renderer);  /* put it all on the screen! */
@@ -136,5 +117,5 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 /* This function runs once at shutdown. */
 void SDL_AppQuit(void *appstate, SDL_AppResult result)
 {
-    /* SDL will clean up the window/renderer for us. */
+    delete gameObject;
 }

@@ -5,7 +5,7 @@
 
 #include <SDL3/SDL.h>
 
-#include "game_object_type_enum.hpp"
+#include "GameObjectTypeEnum.hpp"
 
 class GameObject {
     std::vector<GameObject*> _children;
@@ -20,6 +20,14 @@ class GameObject {
         {
             Type = type;
             _children.reserve(2);
+        }
+
+        virtual ~GameObject()
+        {
+            for(int i = 0; i < _children.size(); i++)
+            {
+                delete _children[i];
+            }
         }
 
         virtual void Update(float deltaTime)
