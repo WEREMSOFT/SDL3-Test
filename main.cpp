@@ -8,7 +8,8 @@
  */
 
 #include "core/GameObject.hpp"
-#include "game/CircleBehaviour.hpp"
+#include "game/CircleBehavior.hpp"
+#include "game/World.hpp"
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_filesystem.h>
 #include <SDL3/SDL_init.h>
@@ -26,11 +27,7 @@
 /* We will use this renderer to draw into this window every frame. */
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
-static SDL_Texture *texture = NULL;
 
-static SDL_Point texture_size = {0};
-
-GameObject *gameObject;
 Uint64 last = SDL_GetPerformanceCounter();
 
 /* This function runs once at startup. */
@@ -51,30 +48,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     }
     SDL_SetRenderLogicalPresentation(renderer, 640, 480, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-    char* pngPath = NULL;
+    World* world = new World(renderer);
 
-    SDL_asprintf(&pngPath, "%slanding-base.png", SDL_GetBasePath());
-
-    SDL_Surface* surface = SDL_LoadPNG(pngPath);
-
-    SDL_free(pngPath);
-
-    texture_size.x = surface->w;
-    texture_size.y = surface->h;
-
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
-
-    SDL_DestroySurface(surface);
-
-    gameObject = GameObject::CreateDrawable(texture);
-
-    gameObject->Dimensions.x = -2.;
-    // gameObject->Dimensions.w *= 2.0;
-    // gameObject->Dimensions.h *= 2.0;
-
-    auto circleBehavior = new CircleBehaviour();
-
-    gameObject->AddChild(circleBehavior);
+    *appstate = world;
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
@@ -106,8 +82,10 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     SDL_SetRenderDrawColor(renderer, 15, 50, 90, SDL_ALPHA_OPAQUE);  /* dark gray, full alpha */
     SDL_RenderClear(renderer);  /* start with a blank canvas. */
 
-    gameObject->Update(deltaTime);
-    gameObject->Draw(renderer);
+    World* world = (World *)appstate;
+
+    world->Update(deltaTime);
+    world->Draw(renderer);
 
     SDL_RenderPresent(renderer);  /* put it all on the screen! */
 
@@ -117,5 +95,5 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 /* This function runs once at shutdown. */
 void SDL_AppQuit(void *appstate, SDL_AppResult result)
 {
-    delete gameObject;
+    delete (World*)appstate;
 }

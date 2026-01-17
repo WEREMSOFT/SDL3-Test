@@ -3,15 +3,16 @@
 #include <stdio.h>
 #include "../core/GameObject.hpp"
 
-class CircleBehaviour: public GameObject
+class CircleBehavior: public GameObject
 {
     public:
-        CircleBehaviour()
+        CircleBehavior()
         {
             Type = GameObjectTypeEnum::BEHAVIOR;
+            snprintf(Tag, 100, "Circle Behavior");
         }
 
-        ~CircleBehaviour()
+        ~CircleBehavior()
         {
             printf("destroying behavior\n");
         }

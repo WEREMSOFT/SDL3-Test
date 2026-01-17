@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_render.h>
+#include <stdio.h>
 #include <vector>
 
 #include <SDL3/SDL.h>
@@ -11,6 +12,7 @@ class GameObject {
     std::vector<GameObject*> _children;
 
     public :
+        char Tag[50] = {0};
         SDL_Texture* Texture;
         GameObjectTypeEnum Type;
         GameObject* Parent = nullptr;
@@ -24,6 +26,15 @@ class GameObject {
 
         virtual ~GameObject()
         {
+            if(strlen(Tag) == 0)
+            {
+                printf("destroying game object\n");
+            }
+            else
+            {
+                printf("Destroying gameobject with tag: %s\n", Tag);
+            }
+
             for(int i = 0; i < _children.size(); i++)
             {
                 delete _children[i];
