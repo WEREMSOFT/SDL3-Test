@@ -15,7 +15,7 @@ class World: public GameObject
 
             snprintf(Tag, 100, "World");
 
-            Car* car = new Car();
+            Car* car = new Car(renderer);
             AddChild(car);
         }
 

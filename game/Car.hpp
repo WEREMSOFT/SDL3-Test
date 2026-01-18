@@ -1,12 +1,14 @@
 #pragma once
 
 #include "../core/GameObject.hpp"
+#include "KeyboardBehavior.hpp"
+#include <SDL3/SDL_render.h>
 
 
-class Car: GameObject
+class Car: public GameObject
 {
     public:
-        Car()
+        Car(SDL_Renderer* renderer)
         {
             snprintf(Tag, 100, "Car");
             Type = GameObjectTypeEnum::DRAWABLE;
@@ -24,8 +26,13 @@ class Car: GameObject
             texture_size.x = surface->w;
             texture_size.y = surface->h;
 
-            texture = SDL_CreateTextureFromSurface(renderer, surface);
+            Dimensions.w = surface->w;
+            Dimensions.h = surface->h;
+
+            Texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+            AddChild(new KeyboardBehavior());
 
             SDL_DestroySurface(surface);
         }
-}
+};
