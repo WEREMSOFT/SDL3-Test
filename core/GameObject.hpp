@@ -12,11 +12,13 @@ class GameObject {
     std::vector<GameObject*> _children;
 
     public :
+        float Angle = 0;
         char Tag[50] = {0};
         SDL_Texture* Texture;
         GameObjectTypeEnum Type;
         GameObject* Parent = nullptr;
         SDL_FRect Dimensions = {0};
+        SDL_FRect SourceRect = {0};
 
         GameObject(GameObjectTypeEnum type = GameObjectTypeEnum::UNKNOWN)
         {
@@ -53,7 +55,10 @@ class GameObject {
         {
             if(Texture != NULL)
             {
-                SDL_RenderTexture(renderer, Texture, NULL, &Dimensions);
+                if(SourceRect.h == 0 || SourceRect.w == 0)
+                    SDL_RenderTexture(renderer, Texture, NULL, &Dimensions);
+                else
+                    SDL_RenderTexture(renderer, Texture, &SourceRect, &Dimensions);
             }
 
             for(int i = 0; i < _children.size(); i++)

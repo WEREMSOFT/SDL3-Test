@@ -2,11 +2,12 @@
 
 #include "../core/GameObject.hpp"
 #include "KeyboardBehavior.hpp"
-#include <SDL3/SDL_render.h>
-
+#include <SDL3/SDL_surface.h>
 
 class Car: public GameObject
 {
+    static constexpr float TWO_PI = 2. * M_PI;
+    static const int NUM_FRAMES = 16;
     public:
         Car(SDL_Renderer* renderer)
         {
@@ -17,22 +18,46 @@ class Car: public GameObject
 
             char* pngPath = NULL;
 
-            SDL_asprintf(&pngPath, "%scar.png", SDL_GetBasePath());
+            SDL_asprintf(&pngPath, "%sAssets/PixelWheels_Porsche_Red.bmp", SDL_GetBasePath());
 
-            SDL_Surface* surface = SDL_LoadPNG(pngPath);
+            SDL_Surface* surface = SDL_LoadBMP(pngPath);
 
             SDL_free(pngPath);
 
             texture_size.x = surface->w;
             texture_size.y = surface->h;
 
-            Dimensions.w = surface->w;
-            Dimensions.h = surface->h;
+            Dimensions.h = Dimensions.w = SourceRect.h = SourceRect.w = 100;
+            SourceRect.x = 0;
+            SourceRect.y = 0;
+
+            Dimensions.y = Dimensions.x = 100;
 
             Texture = SDL_CreateTextureFromSurface(renderer, surface);
 
             AddChild(new KeyboardBehavior());
 
             SDL_DestroySurface(surface);
+        }
+
+        void Update(float deltaTime) override
+        {
+            static float elapsedFrametime = 0;
+            elapsedFrametime += deltaTime;
+            GameObject::Update(deltaTime);
+
+            float tempAngle = fmodf(Angle, TWO_PI);
+            if(tempAngle < 0)
+            {
+                tempAngle += TWO_PI;
+            }
+
+            float sector = TWO_PI / NUM_FRAMES;
+
+            tempAngle += sector * .5;
+
+            int frame = ((int)(tempAngle / sector)) % NUM_FRAMES;
+
+            SourceRect.y = 100 * frame;
         }
 };

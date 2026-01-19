@@ -3,6 +3,7 @@
 #include "CircleBehavior.hpp"
 #include "KeyboardBehavior.hpp"
 #include "Car.hpp"
+#include <SDL3/SDL_render.h>
 
 class World: public GameObject
 {
@@ -22,5 +23,13 @@ class World: public GameObject
         ~World()
         {
             printf("destroying world\n");
+        }
+
+        void Draw(SDL_Renderer* renderer) override
+        {
+            GameObject::Draw(renderer);
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  /* white, full alpha */
+            SDL_RenderDebugText(renderer, 0, 0, "WASD to accelerate, break and turn.");
+            SDL_RenderDebugText(renderer, 0, 20, "Esc to quit(on desktop)");
         }
 };
