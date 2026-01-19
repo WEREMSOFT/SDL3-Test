@@ -3,6 +3,7 @@
 #include "CircleBehavior.hpp"
 #include "KeyboardBehavior.hpp"
 #include "Car.hpp"
+#include "TileGround.hpp"
 #include <SDL3/SDL_render.h>
 
 class World: public GameObject
@@ -16,8 +17,11 @@ class World: public GameObject
 
             snprintf(Tag, 100, "World");
 
-            Car* car = new Car(renderer);
+            auto car = new Car(renderer);
+            auto ground = new TileGround(renderer, car);
+            AddChild(ground);
             AddChild(car);
+
         }
 
         ~World()

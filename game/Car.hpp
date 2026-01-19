@@ -8,6 +8,8 @@ class Car: public GameObject
 {
     static constexpr float TWO_PI = 2. * M_PI;
     static const int NUM_FRAMES = 16;
+    SDL_FRect _prevDimensions = {0};
+
     public:
         Car(SDL_Renderer* renderer)
         {
@@ -18,9 +20,9 @@ class Car: public GameObject
 
             char* pngPath = NULL;
 
-            SDL_asprintf(&pngPath, "%sAssets/PixelWheels_Porsche_Red.bmp", SDL_GetBasePath());
+            SDL_asprintf(&pngPath, "%sAssets/PixelWheels_Porsche_Red.png", SDL_GetBasePath());
 
-            SDL_Surface* surface = SDL_LoadBMP(pngPath);
+            SDL_Surface* surface = SDL_LoadPNG(pngPath);
 
             SDL_free(pngPath);
 
@@ -46,6 +48,16 @@ class Car: public GameObject
             elapsedFrametime += deltaTime;
             GameObject::Update(deltaTime);
 
+            if(elapsedFrametime > 0.1 && (_prevDimensions.x != Dimensions.x || _prevDimensions.y != Dimensions.y))
+            {
+                elapsedFrametime = 0;
+                SourceRect.x += 100;
+                if(SourceRect.x > 300)
+                {
+                    SourceRect.x = 0;
+                }
+            }
+
             float tempAngle = fmodf(Angle, TWO_PI);
             if(tempAngle < 0)
             {
@@ -59,5 +71,7 @@ class Car: public GameObject
             int frame = ((int)(tempAngle / sector)) % NUM_FRAMES;
 
             SourceRect.y = 100 * frame;
+
+            _prevDimensions = Dimensions;
         }
 };
