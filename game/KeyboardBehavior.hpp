@@ -2,16 +2,13 @@
 #include <SDL3/SDL_scancode.h>
 #include <math.h>
 #include <stdio.h>
-#include "../core/GameObject.hpp"
+#include "MovingGameObject.hpp"
 #include "../core/Vector2.hpp"
 
 #include <SDL3/SDL.h>
 
 class KeyboardBehavior: public GameObject
 {
-    const float _velocity = 150.;
-    const float _angularVelocity = 2.;
-
     public:
         KeyboardBehavior()
         {
@@ -23,6 +20,8 @@ class KeyboardBehavior: public GameObject
         {
             Vector2f direction = { 0, 1. };
             GameObject::Update(deltaTime);
+
+            auto movingParent = (MovingGameObject*)Parent;
 
             static float phase = 0;
 
@@ -36,23 +35,23 @@ class KeyboardBehavior: public GameObject
             }
 
             if (keys[SDL_SCANCODE_D]) {
-                Parent->Angle += _angularVelocity * deltaTime;
+                Parent->Angle += movingParent->AngularVelocity * deltaTime;
             }
 
             if (keys[SDL_SCANCODE_A]) {
-                Parent->Angle -= _angularVelocity * deltaTime;
+                Parent->Angle -= movingParent->AngularVelocity * deltaTime;
             }
 
             direction = Rotate(direction, Parent->Angle);
 
             if (keys[SDL_SCANCODE_W]) {
-                Vector2f vecIncrement = Scale(direction, -_velocity * deltaTime);
+                Vector2f vecIncrement = Scale(direction, -movingParent->Velocity * deltaTime);
                 Parent->Dimensions.x += vecIncrement.x;
                 Parent->Dimensions.y += vecIncrement.y;
             }
 
             if (keys[SDL_SCANCODE_S]) {
-                Vector2f vecIncrement = Scale(direction, _velocity * deltaTime);
+                Vector2f vecIncrement = Scale(direction, movingParent->Velocity * deltaTime);
                 Parent->Dimensions.x += vecIncrement.x;
                 Parent->Dimensions.y += vecIncrement.y;
             }

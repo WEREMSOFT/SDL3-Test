@@ -6,23 +6,25 @@
  *
  * This code is public domain. Feel free to use it for any purpose!
  */
-
+ #include <SDL3/SDL_events.h>
+ #include <SDL3/SDL_filesystem.h>
+ #include <SDL3/SDL_init.h>
+ #include <SDL3/SDL_rect.h>
+ #include <SDL3/SDL_render.h>
+ #include <SDL3/SDL_scancode.h>
+ #include <SDL3/SDL_stdinc.h>
+ #include <SDL3/SDL_surface.h>
+ #include <SDL3/SDL_timer.h>
+ #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
+ #include <SDL3/SDL.h>
+ #include <SDL3/SDL_main.h>
+// SDL_COMPILE_TIME_ASSERT(SDL_Version, SDL_VERSION_ATLEAST(3, 4, 0));
 #include "core/GameObject.hpp"
 #include "game/CircleBehavior.hpp"
 #include "game/World.hpp"
-#include <SDL3/SDL_events.h>
-#include <SDL3/SDL_filesystem.h>
-#include <SDL3/SDL_init.h>
-#include <SDL3/SDL_rect.h>
-#include <SDL3/SDL_render.h>
-#include <SDL3/SDL_scancode.h>
-#include <SDL3/SDL_stdinc.h>
-#include <SDL3/SDL_surface.h>
-#include <SDL3/SDL_timer.h>
-#define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
-#include <SDL3/SDL.h>
-#include <SDL3/SDL_main.h>
+
 #include <math.h>
+
 
 /* We will use this renderer to draw into this window every frame. */
 static SDL_Window *window = NULL;
@@ -33,6 +35,20 @@ Uint64 last = SDL_GetPerformanceCounter();
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
+
+    const int compiled = SDL_VERSION;  /* hardcoded number from SDL headers */
+    const int linked = SDL_GetVersion();  /* reported by linked SDL library */
+
+    SDL_Log("We compiled against SDL version %d.%d.%d ...\n",
+            SDL_VERSIONNUM_MAJOR(compiled),
+            SDL_VERSIONNUM_MINOR(compiled),
+            SDL_VERSIONNUM_MICRO(compiled));
+
+    SDL_Log("But we are linking against SDL version %d.%d.%d.\n",
+            SDL_VERSIONNUM_MAJOR(linked),
+            SDL_VERSIONNUM_MINOR(linked),
+            SDL_VERSIONNUM_MICRO(linked));
+
     int i;
 
     SDL_SetAppMetadata("SDL3 Test", "1.0", "none");

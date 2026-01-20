@@ -4,6 +4,7 @@
 #include "KeyboardBehavior.hpp"
 #include "Car.hpp"
 #include "TileGround.hpp"
+#include "Zombie.hpp"
 #include <SDL3/SDL_render.h>
 
 class World: public GameObject
@@ -17,11 +18,12 @@ class World: public GameObject
 
             snprintf(Tag, 100, "World");
 
-            auto car = new Car(renderer);
-            auto ground = new TileGround(renderer, car);
-            AddChild(ground);
-            AddChild(car);
-
+            // auto car = new Car(renderer);
+            // auto ground = new TileGround(renderer, car);
+            auto zombie = new Zombie(renderer);
+            // AddChild(ground);
+            // AddChild(car);
+            AddChild(zombie);
         }
 
         ~World()

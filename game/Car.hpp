@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../core/GameObject.hpp"
+#include "MovingGameObject.hpp"
 #include "KeyboardBehavior.hpp"
 #include <SDL3/SDL_surface.h>
 
-class Car: public GameObject
+class Car: public MovingGameObject
 {
     static constexpr float TWO_PI = 2. * M_PI;
     static const int NUM_FRAMES = 16;
@@ -15,6 +15,9 @@ class Car: public GameObject
         {
             snprintf(Tag, 100, "Car");
             Type = GameObjectTypeEnum::DRAWABLE;
+
+            Velocity = 150.;
+            AngularVelocity = 2.;
 
             SDL_Point texture_size = {0};
 
