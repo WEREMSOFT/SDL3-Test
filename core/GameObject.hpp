@@ -55,10 +55,21 @@ class GameObject {
         {
             if(Texture != NULL)
             {
+                auto tempParent = Parent;
+                SDL_FRect tempDimensions = { Dimensions.x, Dimensions.y, Dimensions.w, Dimensions.h};
+                while(tempParent != nullptr)
+                {
+                    tempDimensions.x += tempParent->Dimensions.x;
+                    tempDimensions.y += tempParent->Dimensions.y;
+                    tempParent = tempParent->Parent;
+                }
+
                 if(SourceRect.h == 0 || SourceRect.w == 0)
-                    SDL_RenderTexture(renderer, Texture, NULL, &Dimensions);
+                    SDL_RenderTexture(renderer, Texture, NULL, &tempDimensions);
                 else
-                    SDL_RenderTexture(renderer, Texture, &SourceRect, &Dimensions);
+                {
+                    SDL_RenderTexture(renderer, Texture, &SourceRect, &tempDimensions);
+                }
             }
 
             for(int i = 0; i < _children.size(); i++)

@@ -3,6 +3,7 @@
 #include "CircleBehavior.hpp"
 #include "KeyboardBehavior.hpp"
 #include "Car.hpp"
+#include "LandingBase.hpp"
 #include "TileGround.hpp"
 #include "Zombie.hpp"
 #include <SDL3/SDL_render.h>
@@ -18,12 +19,14 @@ class World: public GameObject
 
             snprintf(Tag, 100, "World");
 
-            // auto car = new Car(renderer);
+            auto landingBase = new LandingBase(renderer);
+            auto car = new Car(renderer);
+            car->AddChild(landingBase);
             // auto ground = new TileGround(renderer, car);
-            auto zombie = new Zombie(renderer);
+            // auto zombie = new Zombie(renderer);
             // AddChild(ground);
-            // AddChild(car);
-            AddChild(zombie);
+            AddChild(car);
+            // AddChild(zombie);
         }
 
         ~World()

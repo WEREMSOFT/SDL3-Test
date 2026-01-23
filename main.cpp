@@ -18,9 +18,7 @@
  #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
  #include <SDL3/SDL.h>
  #include <SDL3/SDL_main.h>
-// SDL_COMPILE_TIME_ASSERT(SDL_Version, SDL_VERSION_ATLEAST(3, 4, 0));
-#include "core/GameObject.hpp"
-#include "game/CircleBehavior.hpp"
+SDL_COMPILE_TIME_ASSERT(SDL_Version, SDL_VERSION_ATLEAST(3, 4, 0));
 #include "game/World.hpp"
 
 #include <math.h>
