@@ -3,7 +3,8 @@
 #include "Car.hpp"
 #include "BackGround.hpp"
 #include "ForeGround.hpp"
-#include "LandingBase.hpp"
+#include "GenericImage.hpp"
+#include "Piggeon.hpp"
 #include <SDL3/SDL_render.h>
 
 class World: public GameObject
@@ -29,14 +30,39 @@ class World: public GameObject
 
             _car->Dimensions.x = _backGround->Dimensions.w / 2.;
             _car->Dimensions.y = _backGround->Dimensions.h / 2.;
-            auto landingPlatform = new LandingBase(renderer);
+
+
+
+
+
+            // auto landingPlatform = new LandingBase(renderer);
             // auto ground = new TileGround(renderer, car);
             // auto zombie = new Zombie(renderer);
             // AddChild(ground);
             AddChild(_backGround);
             _backGround->AddChild(_car);
+
+            const int piggeonSideCount = 20;
+            const float piggeonPadding = 50.;
+
+            for(int i = 0; i < piggeonSideCount; i++)
+            {
+                for(int j = 0; j < piggeonSideCount; j++)
+                {
+                    auto piggeon = new Piggeon(renderer, _car);
+                    auto piggeonShadow = new GenericImage(renderer, "Assets/pigeonShadow.png");
+                    piggeonShadow->Dimensions.x = 7;
+                    piggeonShadow->Dimensions.y = 20;
+                    piggeon->Dimensions.x = (_backGround->Dimensions.w - piggeonSideCount * piggeonPadding) / 2. + 30. * i;
+                    piggeon->Dimensions.y = (_backGround->Dimensions.h  - piggeonSideCount * piggeonPadding) / 2. + 30. * j;
+                    piggeon->AddChild(piggeonShadow);
+                    _backGround->AddChild(piggeon);
+                }
+            }
+
+
             // AddChild(_car);
-            _car->AddChild(landingPlatform);
+            // _car->AddChild(landingPlatform);
             // AddChild(zombie);
             auto treesFront = new ForeGround(renderer);
 

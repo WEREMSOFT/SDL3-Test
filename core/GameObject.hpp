@@ -9,6 +9,7 @@
 #include "GameObjectTypeEnum.hpp"
 
 class GameObject {
+    protected:
     std::vector<GameObject*> _children;
 
     public :

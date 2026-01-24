@@ -9,7 +9,7 @@ typedef struct Vector2f
 
 float Length(Vector2f v)
 {
-    return sqrt(v.x * v.x * v.y + v.y);
+    return sqrt(v.x * v.x + v.y * v.y);
 }
 
 Vector2f Normalize(Vector2f v)
