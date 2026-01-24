@@ -20,15 +20,15 @@ class World: public GameObject
             snprintf(Tag, 100, "World");
 
             _backGround = new BackGround(renderer);
-            _backGround->Dimensions.x = -2560;
-            _backGround->Dimensions.y = -1260;
+            _backGround->Dimensions.x = -_backGround->Dimensions.w / 2.;
+            _backGround->Dimensions.y = -_backGround->Dimensions.h / 2.;
             _car = new Car(renderer);
 
             // _car->Dimensions.y = 384;
             // _car->Dimensions.x = 512;
 
-            _car->Dimensions.x = 2560;
-            _car->Dimensions.y = 1260;
+            _car->Dimensions.x = _backGround->Dimensions.w / 2.;
+            _car->Dimensions.y = _backGround->Dimensions.h / 2.;
             auto landingPlatform = new LandingBase(renderer);
             // auto ground = new TileGround(renderer, car);
             // auto zombie = new Zombie(renderer);
@@ -39,8 +39,8 @@ class World: public GameObject
             _car->AddChild(landingPlatform);
             // AddChild(zombie);
             auto treesFront = new ForeGround(renderer);
-            treesFront->Dimensions.y = -20;
-            treesFront->Dimensions.x = -10;
+            // treesFront->Dimensions.y = -20;
+            // treesFront->Dimensions.x = -10;
             _backGround->AddChild(treesFront);
         }
 

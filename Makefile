@@ -15,7 +15,7 @@ build: clean
 run_main: build
 	./main.bin
 
-build_web:
+build_web: clean
 	mkdir -p web
 	$(EMCC) main.cpp libSDL3.a $(WEB_FLAGS) -o $(WEB_OUT)
 
