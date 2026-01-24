@@ -29,8 +29,6 @@ class ForeGround: public GameObject
         SourceRect.x = 0;
         SourceRect.y = 0;
 
-        Dimensions.y = Dimensions.x = 100;
-
         Texture = SDL_CreateTextureFromSurface(renderer, surface);
 
         SDL_DestroySurface(surface);

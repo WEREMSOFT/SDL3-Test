@@ -39,8 +39,7 @@ class World: public GameObject
             _car->AddChild(landingPlatform);
             // AddChild(zombie);
             auto treesFront = new ForeGround(renderer);
-            // treesFront->Dimensions.y = -20;
-            // treesFront->Dimensions.x = -10;
+
             _backGround->AddChild(treesFront);
         }
 
