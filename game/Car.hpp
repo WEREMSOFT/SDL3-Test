@@ -16,7 +16,7 @@ class Car: public MovingGameObject
             snprintf(Tag, 100, "Car");
             Type = GameObjectTypeEnum::DRAWABLE;
 
-            Velocity = 150.;
+            Velocity = 200.;
             AngularVelocity = 2.;
 
             SDL_Point texture_size = {0};
@@ -35,8 +35,6 @@ class Car: public MovingGameObject
             Dimensions.h = Dimensions.w = SourceRect.h = SourceRect.w = 100;
             SourceRect.x = 0;
             SourceRect.y = 0;
-
-            Dimensions.y = Dimensions.x = 100;
 
             Texture = SDL_CreateTextureFromSurface(renderer, surface);
 

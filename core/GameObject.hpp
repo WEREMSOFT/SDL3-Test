@@ -56,19 +56,13 @@ class GameObject {
             if(Texture != NULL)
             {
                 auto tempParent = Parent;
-                SDL_FRect tempDimensions = { Dimensions.x, Dimensions.y, Dimensions.w, Dimensions.h};
-                while(tempParent != nullptr)
-                {
-                    tempDimensions.x += tempParent->Dimensions.x;
-                    tempDimensions.y += tempParent->Dimensions.y;
-                    tempParent = tempParent->Parent;
-                }
+                SDL_FRect worldPosition = GetWorldPositions();
 
                 if(SourceRect.h == 0 || SourceRect.w == 0)
-                    SDL_RenderTexture(renderer, Texture, NULL, &tempDimensions);
+                    SDL_RenderTexture(renderer, Texture, NULL, &worldPosition);
                 else
                 {
-                    SDL_RenderTexture(renderer, Texture, &SourceRect, &tempDimensions);
+                    SDL_RenderTexture(renderer, Texture, &SourceRect, &worldPosition);
                 }
             }
 
@@ -95,5 +89,18 @@ class GameObject {
             gameObject->Dimensions.h = texture->h;
 
             return gameObject;
+        }
+
+        virtual SDL_FRect GetWorldPositions()
+        {
+            auto tempParent = Parent;
+            SDL_FRect worldPosition = { Dimensions.x, Dimensions.y, Dimensions.w, Dimensions.h};
+            while(tempParent != nullptr)
+            {
+                worldPosition.x += tempParent->Dimensions.x;
+                worldPosition.y += tempParent->Dimensions.y;
+                tempParent = tempParent->Parent;
+            }
+            return worldPosition;
         }
 };

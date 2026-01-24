@@ -1,16 +1,16 @@
 #pragma once
 #include "../core/GameObject.hpp"
-#include "CircleBehavior.hpp"
-#include "KeyboardBehavior.hpp"
 #include "Car.hpp"
+#include "BackGround.hpp"
+#include "ForeGround.hpp"
 #include "LandingBase.hpp"
-#include "TileGround.hpp"
-#include "Zombie.hpp"
 #include <SDL3/SDL_render.h>
 
 class World: public GameObject
 {
     SDL_Texture *texture = NULL;
+    Car* _car;
+    BackGround* _backGround;
 
     public:
         World(SDL_Renderer* renderer)
@@ -19,19 +19,42 @@ class World: public GameObject
 
             snprintf(Tag, 100, "World");
 
-            auto landingBase = new LandingBase(renderer);
-            auto car = new Car(renderer);
-            car->AddChild(landingBase);
+            _backGround = new BackGround(renderer);
+            _backGround->Dimensions.x = -2560;
+            _backGround->Dimensions.y = -1260;
+            _car = new Car(renderer);
+
+            // _car->Dimensions.y = 384;
+            // _car->Dimensions.x = 512;
+
+            _car->Dimensions.x = 2560;
+            _car->Dimensions.y = 1260;
+            auto landingPlatform = new LandingBase(renderer);
             // auto ground = new TileGround(renderer, car);
             // auto zombie = new Zombie(renderer);
             // AddChild(ground);
-            AddChild(car);
+            AddChild(_backGround);
+            _backGround->AddChild(_car);
+            // AddChild(_car);
+            _car->AddChild(landingPlatform);
             // AddChild(zombie);
+            auto treesFront = new ForeGround(renderer);
+            treesFront->Dimensions.y = -20;
+            treesFront->Dimensions.x = -10;
+            _backGround->AddChild(treesFront);
         }
 
         ~World()
         {
             printf("destroying world\n");
+        }
+
+        void Update(float deltaTime) override
+        {
+            GameObject::Update(deltaTime);
+            auto carPosition = _car->GetWorldPositions();
+            _backGround->Dimensions.x = -_car->Dimensions.x + 412;
+            _backGround->Dimensions.y = -_car->Dimensions.y + 300;
         }
 
         void Draw(SDL_Renderer* renderer) override

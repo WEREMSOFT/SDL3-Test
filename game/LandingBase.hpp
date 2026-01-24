@@ -8,7 +8,7 @@ class LandingBase: public GameObject
     public:
     LandingBase(SDL_Renderer* renderer)
     {
-        snprintf(Tag, 100, "Car");
+        snprintf(Tag, 100, "Landing Base");
         Type = GameObjectTypeEnum::DRAWABLE;
 
         SDL_Point texture_size = {0};
