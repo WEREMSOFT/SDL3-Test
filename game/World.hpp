@@ -6,6 +6,7 @@
 #include "GenericImage.hpp"
 #include "Piggeon.hpp"
 #include <SDL3/SDL_render.h>
+#include <SDL3/SDL_stdinc.h>
 
 class World: public GameObject
 {
@@ -31,7 +32,6 @@ class World: public GameObject
             _car->Dimensions.x = _backGround->Dimensions.w / 2.;
             _car->Dimensions.y = _backGround->Dimensions.h / 2.;
 
-
             // auto landingPlatform = new LandingBase(renderer);
             // auto ground = new TileGround(renderer, car);
             // auto zombie = new Zombie(renderer);
@@ -39,22 +39,20 @@ class World: public GameObject
             AddChild(_backGround);
             _backGround->AddChild(_car);
 
-            const int piggeonSideCount = 20;
-            const float piggeonPadding = 50.;
+            const int piggeonSideCount = 50;
 
             for(int i = 0; i < piggeonSideCount; i++)
             {
-                for(int j = 0; j < piggeonSideCount; j++)
-                {
+                    float piggeonX = 2045.f + SDL_randf() * (3900.f - 2045.f);
+                    float piggeonY = 906.f + SDL_randf() * (1991.f - 906.f);
                     auto piggeon = new Piggeon(renderer, _car);
                     auto piggeonShadow = new GenericImage(renderer, "Assets/pigeonShadow.png");
                     piggeonShadow->Dimensions.x = 7;
                     piggeonShadow->Dimensions.y = 20;
-                    piggeon->Dimensions.x = (_backGround->Dimensions.w - piggeonSideCount * piggeonPadding) / 2. + 30. * i;
-                    piggeon->Dimensions.y = (_backGround->Dimensions.h  - piggeonSideCount * piggeonPadding) / 2. + 30. * j;
+                    piggeon->Dimensions.x = piggeonX;
+                    piggeon->Dimensions.y = piggeonY;
                     piggeon->AddChild(piggeonShadow);
                     _backGround->AddChild(piggeon);
-                }
             }
 
 
@@ -77,6 +75,16 @@ class World: public GameObject
             auto carPosition = _car->GetWorldPositions();
             _backGround->Dimensions.x = -_car->Dimensions.x + 412;
             _backGround->Dimensions.y = -_car->Dimensions.y + 300;
+
+            for(int i = 0; i < _children.size(); i++)
+            {
+                if(_children[i]->Tag[0] != 'B' && _children[i]->Tag[0] != 'F')
+                {
+                    _children[i]->Dimensions.y = SDL_clamp(_children[i]->Dimensions.y, .5f * _children[i]->Dimensions.x - 1250, .5f * _children[i]->Dimensions.x + 1530);
+                    _children[i]->Dimensions.y = SDL_clamp(_children[i]->Dimensions.y, -.5f * _children[i]->Dimensions.x + 1930, -.5f * _children[i]->Dimensions.x + 4670);
+                    _children[i]->Dimensions.x = SDL_clamp(_children[i]->Dimensions.x, 400, 5912);
+                }
+            }
         }
 
         void Draw(SDL_Renderer* renderer) override

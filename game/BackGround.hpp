@@ -35,4 +35,19 @@ class BackGround: public GameObject
 
         SDL_DestroySurface(surface);
     }
+
+    void Update(float deltaTime) override
+    {
+        GameObject::Update(deltaTime);
+
+        for(int i = 0; i < _children.size(); i++)
+        {
+            if(_children[i]->Tag[0] != 'F')
+            {
+                _children[i]->Dimensions.y = SDL_clamp(_children[i]->Dimensions.y, .5f * _children[i]->Dimensions.x - 1250, .5f * _children[i]->Dimensions.x + 1530);
+                _children[i]->Dimensions.y = SDL_clamp(_children[i]->Dimensions.y, -.5f * _children[i]->Dimensions.x + 1930, -.5f * _children[i]->Dimensions.x + 4670);
+                _children[i]->Dimensions.x = SDL_clamp(_children[i]->Dimensions.x, 400, 5912);
+            }
+        }
+    }
 };

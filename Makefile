@@ -6,7 +6,7 @@ EMCC = em++
 WEB_FLAGS = -std=c++14 -O2 -sALLOW_MEMORY_GROWTH=1 --preload-file Assets
 WEB_OUT = docs/index.html
 
-CXX = g++
+CXX = clang
 CXXFLAGS = -std=c++14 -g $(SDL_CFLAGS)
 
 build: clean

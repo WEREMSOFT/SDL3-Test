@@ -116,9 +116,12 @@ class Piggeon: public MovingGameObject
                 velocityY += gravity * deltaTime;
                 Dimensions.y += velocityY * deltaTime ;
 
+                // printf("Velocity: %.2f\n", velocityY);
+
                 Vector2f vecIncrement = Scale(direction, Velocity * deltaTime);
                 Dimensions.x += vecIncrement.x;
                 Dimensions.y += vecIncrement.y;
+                baseY += vecIncrement.y;
 
                 if(Dimensions.y > baseY)
                 {
