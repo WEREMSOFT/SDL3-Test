@@ -2,6 +2,7 @@
 
 #include "MovingGameObject.hpp"
 #include "KeyboardBehavior.hpp"
+#include <SDL3/SDL_stdinc.h>
 #include <SDL3/SDL_surface.h>
 
 class Car: public MovingGameObject
@@ -74,5 +75,9 @@ class Car: public MovingGameObject
             SourceRect.y = 100 * frame;
 
             _prevDimensions = Dimensions;
+
+            Dimensions.y = SDL_clamp(Dimensions.y, .5f * Dimensions.x - 1250, .5f * Dimensions.x + 1530);
+            Dimensions.y = SDL_clamp(Dimensions.y, -.5f * Dimensions.x + 1930, -.5f * Dimensions.x + 4670);
+            Dimensions.x = SDL_clamp(Dimensions.x, 400, 5912);
         }
 };

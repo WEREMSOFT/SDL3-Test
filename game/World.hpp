@@ -32,9 +32,6 @@ class World: public GameObject
             _car->Dimensions.y = _backGround->Dimensions.h / 2.;
 
 
-
-
-
             // auto landingPlatform = new LandingBase(renderer);
             // auto ground = new TileGround(renderer, car);
             // auto zombie = new Zombie(renderer);
@@ -88,5 +85,10 @@ class World: public GameObject
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  /* white, full alpha */
             SDL_RenderDebugText(renderer, 0, 0, "WASD to accelerate, break and turn.");
             SDL_RenderDebugText(renderer, 0, 20, "Esc to quit(on desktop)");
+
+            char carPositionText[300] = {0};
+            snprintf(carPositionText, 300, "Car Position: %.2f, %.2f", _car->Dimensions.x, _car->Dimensions.y);
+
+            SDL_RenderDebugText(renderer, 0, 40, carPositionText);
         }
 };

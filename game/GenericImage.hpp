@@ -8,7 +8,7 @@ class GenericImage: public GameObject
     public:
     GenericImage(SDL_Renderer* renderer, char* filePath)
     {
-        snprintf(Tag, 100, "Landing Base");
+        snprintf(Tag, 100, filePath);
         Type = GameObjectTypeEnum::DRAWABLE;
 
         SDL_Point texture_size = {0};
