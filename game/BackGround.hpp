@@ -8,7 +8,7 @@ class BackGround: public GameObject
     public:
     BackGround(SDL_Renderer* renderer)
     {
-        snprintf(Tag, 100, "BackGround");
+        Tag = "BackGround";
         Type = GameObjectTypeEnum::DRAWABLE;
 
         SDL_Point texture_size = {0};
@@ -29,25 +29,8 @@ class BackGround: public GameObject
         SourceRect.x = 0;
         SourceRect.y = 0;
 
-        Dimensions.y = Dimensions.x = 100;
-
         Texture = SDL_CreateTextureFromSurface(renderer, surface);
 
         SDL_DestroySurface(surface);
-    }
-
-    void Update(float deltaTime) override
-    {
-        GameObject::Update(deltaTime);
-
-        for(int i = 0; i < _children.size(); i++)
-        {
-            if(_children[i]->Tag[0] != 'F')
-            {
-                _children[i]->Dimensions.y = SDL_clamp(_children[i]->Dimensions.y, .5f * _children[i]->Dimensions.x - 1250, .5f * _children[i]->Dimensions.x + 1530);
-                _children[i]->Dimensions.y = SDL_clamp(_children[i]->Dimensions.y, -.5f * _children[i]->Dimensions.x + 1930, -.5f * _children[i]->Dimensions.x + 4670);
-                _children[i]->Dimensions.x = SDL_clamp(_children[i]->Dimensions.x, 400, 5912);
-            }
-        }
     }
 };

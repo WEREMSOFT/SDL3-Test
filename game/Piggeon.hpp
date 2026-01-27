@@ -41,7 +41,7 @@ class Piggeon: public MovingGameObject
     Piggeon(SDL_Renderer* renderer, Car* car)
     {
         _car = car;
-        snprintf(Tag, 100, "Piggeon");
+        Tag = "Piggeon";
         Type = GameObjectTypeEnum::DRAWABLE;
 
         Velocity = 100.;
@@ -97,7 +97,7 @@ class Piggeon: public MovingGameObject
                     Animation = (int)(random() % 2 == 0 ? AnimationEnum::IDLE_1 : AnimationEnum::IDLE_2);
                 }
 
-                if(distance < 60.)
+                if(distance < 100.)
                 {
                     State = (int)State::FLYING;
                     Animation = (int)AnimationEnum::FLYING;
@@ -148,11 +148,11 @@ class Piggeon: public MovingGameObject
     {
         auto dimensionTemp = Dimensions;
         Dimensions.y = baseY;
-        for(int i = 0; i < _children.size(); i++)
+        for(int i = 0; i < Children.size(); i++)
         {
-            if(_children[i]->Type == GameObjectTypeEnum::DRAWABLE)
+            if(Children[i]->Type == GameObjectTypeEnum::DRAWABLE)
             {
-                _children[i]->Draw(renderer);
+                Children[i]->Draw(renderer);
             }
         }
 

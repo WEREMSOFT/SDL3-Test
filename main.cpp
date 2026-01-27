@@ -15,6 +15,7 @@
  #include <SDL3/SDL_stdinc.h>
  #include <SDL3/SDL_surface.h>
  #include <SDL3/SDL_timer.h>
+#include <cstdio>
  #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
  #include <SDL3/SDL.h>
  #include <SDL3/SDL_main.h>
@@ -103,6 +104,11 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
     world->Update(deltaTime);
     world->Draw(renderer);
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+    char fpsText[100] = {0};
+    snprintf(fpsText, 100, "fps: %.2f", 1.f / deltaTime);
+    SDL_RenderDebugText(renderer, 300, 0, fpsText);
 
     SDL_RenderPresent(renderer);  /* put it all on the screen! */
 

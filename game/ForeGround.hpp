@@ -8,7 +8,7 @@ class ForeGround: public GameObject
     public:
     ForeGround(SDL_Renderer* renderer)
     {
-        snprintf(Tag, 100, "ForeGround");
+        Tag = "ForeGround";
         Type = GameObjectTypeEnum::DRAWABLE;
 
         SDL_Point texture_size = {0};

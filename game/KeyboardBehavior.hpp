@@ -13,7 +13,7 @@ class KeyboardBehavior: public GameObject
         KeyboardBehavior()
         {
             Type = GameObjectTypeEnum::BEHAVIOR;
-            snprintf(Tag, 100, "Keyboard Behavior");
+            Tag = "Keyboard Behavior";
         }
 
         void Update(float deltaTime) override

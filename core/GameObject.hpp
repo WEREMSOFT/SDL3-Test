@@ -3,6 +3,7 @@
 #include <SDL3/SDL_render.h>
 #include <stdio.h>
 #include <vector>
+#include <string>
 
 #include <SDL3/SDL.h>
 
@@ -10,11 +11,11 @@
 
 class GameObject {
     protected:
-    std::vector<GameObject*> _children;
 
     public :
+        std::vector<GameObject*> Children;
         float Angle = 0;
-        char Tag[50] = {0};
+        std::string Tag = "GameObject";
         SDL_Texture* Texture;
         GameObjectTypeEnum Type;
         GameObject* Parent = nullptr;
@@ -24,31 +25,31 @@ class GameObject {
         GameObject(GameObjectTypeEnum type = GameObjectTypeEnum::UNKNOWN)
         {
             Type = type;
-            _children.reserve(2);
+            Children.reserve(2);
         }
 
         virtual ~GameObject()
         {
-            if(strlen(Tag) == 0)
+            if(Tag == "GameObject")
             {
                 printf("destroying game object\n");
             }
             else
             {
-                printf("Destroying gameobject with tag: %s\n", Tag);
+                printf("Destroying gameobject with tag: %s\n", Tag.c_str());
             }
 
-            for(int i = 0; i < _children.size(); i++)
+            for(int i = 0; i < Children.size(); i++)
             {
-                delete _children[i];
+                delete Children[i];
             }
         }
 
         virtual void Update(float deltaTime)
         {
-            for(int i = 0; i < _children.size(); i++)
+            for(int i = 0; i < Children.size(); i++)
             {
-                _children[i]->Update(deltaTime);
+                Children[i]->Update(deltaTime);
             }
         }
 
@@ -67,11 +68,11 @@ class GameObject {
                 }
             }
 
-            for(int i = 0; i < _children.size(); i++)
+            for(int i = 0; i < Children.size(); i++)
             {
-                if(_children[i]->Type == GameObjectTypeEnum::DRAWABLE)
+                if(Children[i]->Type == GameObjectTypeEnum::DRAWABLE)
                 {
-                    _children[i]->Draw(renderer);
+                    Children[i]->Draw(renderer);
                 }
             }
         }
@@ -79,7 +80,7 @@ class GameObject {
         virtual void AddChild(GameObject* child)
         {
             child->Parent = this;
-            _children.push_back(child);
+            Children.push_back(child);
         }
 
         static GameObject* CreateDrawable(SDL_Texture* texture)

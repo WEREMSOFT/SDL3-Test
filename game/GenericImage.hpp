@@ -6,16 +6,16 @@
 class GenericImage: public GameObject
 {
     public:
-    GenericImage(SDL_Renderer* renderer, char* filePath)
+    GenericImage(SDL_Renderer* renderer, std::string filePath)
     {
-        snprintf(Tag, 100, filePath);
+        Tag = filePath;
         Type = GameObjectTypeEnum::DRAWABLE;
 
         SDL_Point texture_size = {0};
 
         char* pngPath = NULL;
 
-        SDL_asprintf(&pngPath, "%s%s", SDL_GetBasePath(), filePath);
+        SDL_asprintf(&pngPath, "%s%s", SDL_GetBasePath(), filePath.c_str());
 
         SDL_Surface* surface = SDL_LoadPNG(pngPath);
 

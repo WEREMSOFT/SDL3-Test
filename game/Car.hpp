@@ -14,7 +14,7 @@ class Car: public MovingGameObject
     public:
         Car(SDL_Renderer* renderer)
         {
-            snprintf(Tag, 100, "Car");
+            Tag = "Car";
             Type = GameObjectTypeEnum::DRAWABLE;
 
             Velocity = 200.;

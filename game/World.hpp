@@ -13,55 +13,48 @@ class World: public GameObject
     SDL_Texture *texture = NULL;
     Car* _car;
     BackGround* _backGround;
+    GameObject* _middleLayer;
 
     public:
         World(SDL_Renderer* renderer)
         {
             Type = GameObjectTypeEnum::DRAWABLE;
 
-            snprintf(Tag, 100, "World");
+            Tag = "World";
 
             _backGround = new BackGround(renderer);
-            _backGround->Dimensions.x = -_backGround->Dimensions.w / 2.;
-            _backGround->Dimensions.y = -_backGround->Dimensions.h / 2.;
+            Dimensions.x = -_backGround->Dimensions.w / 2.;
+            Dimensions.y = -_backGround->Dimensions.h / 2.;
+            AddChild(_backGround);
+
             _car = new Car(renderer);
-
-            // _car->Dimensions.y = 384;
-            // _car->Dimensions.x = 512;
-
             _car->Dimensions.x = _backGround->Dimensions.w / 2.;
             _car->Dimensions.y = _backGround->Dimensions.h / 2.;
 
-            // auto landingPlatform = new LandingBase(renderer);
-            // auto ground = new TileGround(renderer, car);
-            // auto zombie = new Zombie(renderer);
-            // AddChild(ground);
-            AddChild(_backGround);
-            _backGround->AddChild(_car);
-
-            const int piggeonSideCount = 50;
+            const int piggeonSideCount = 6000;
+            _middleLayer = new GameObject();
+            _middleLayer->Tag = "piggeonContainer";
+            _middleLayer->Type = GameObjectTypeEnum::DRAWABLE;
+            _middleLayer->AddChild(_car);
 
             for(int i = 0; i < piggeonSideCount; i++)
             {
                     float piggeonX = 2045.f + SDL_randf() * (3900.f - 2045.f);
                     float piggeonY = 906.f + SDL_randf() * (1991.f - 906.f);
                     auto piggeon = new Piggeon(renderer, _car);
-                    auto piggeonShadow = new GenericImage(renderer, "Assets/pigeonShadow.png");
+                    std::string piggeonShadowPath = "Assets/pigeonShadow.png";
+                    auto piggeonShadow = new GenericImage(renderer, piggeonShadowPath);
                     piggeonShadow->Dimensions.x = 7;
                     piggeonShadow->Dimensions.y = 20;
                     piggeon->Dimensions.x = piggeonX;
                     piggeon->Dimensions.y = piggeonY;
                     piggeon->AddChild(piggeonShadow);
-                    _backGround->AddChild(piggeon);
+                    _middleLayer->AddChild(piggeon);
             }
+            AddChild(_middleLayer);
 
-
-            // AddChild(_car);
-            // _car->AddChild(landingPlatform);
-            // AddChild(zombie);
             auto treesFront = new ForeGround(renderer);
-
-            _backGround->AddChild(treesFront);
+            AddChild(treesFront);
         }
 
         ~World()
@@ -73,18 +66,11 @@ class World: public GameObject
         {
             GameObject::Update(deltaTime);
             auto carPosition = _car->GetWorldPositions();
-            _backGround->Dimensions.x = -_car->Dimensions.x + 412;
-            _backGround->Dimensions.y = -_car->Dimensions.y + 300;
+            Dimensions.x = -_car->Dimensions.x + 412;
+            Dimensions.y = -_car->Dimensions.y + 300;
 
-            for(int i = 0; i < _children.size(); i++)
-            {
-                if(_children[i]->Tag[0] != 'B' && _children[i]->Tag[0] != 'F')
-                {
-                    _children[i]->Dimensions.y = SDL_clamp(_children[i]->Dimensions.y, .5f * _children[i]->Dimensions.x - 1250, .5f * _children[i]->Dimensions.x + 1530);
-                    _children[i]->Dimensions.y = SDL_clamp(_children[i]->Dimensions.y, -.5f * _children[i]->Dimensions.x + 1930, -.5f * _children[i]->Dimensions.x + 4670);
-                    _children[i]->Dimensions.x = SDL_clamp(_children[i]->Dimensions.x, 400, 5912);
-                }
-            }
+            // ConstraintObjectsToMap(_backGround->Children);
+            ConstraintObjectsToMap(_middleLayer->Children);
         }
 
         void Draw(SDL_Renderer* renderer) override
@@ -98,5 +84,18 @@ class World: public GameObject
             snprintf(carPositionText, 300, "Car Position: %.2f, %.2f", _car->Dimensions.x, _car->Dimensions.y);
 
             SDL_RenderDebugText(renderer, 0, 40, carPositionText);
+        }
+
+        void ConstraintObjectsToMap(std::vector<GameObject*> objectsToConstraint)
+        {
+            for(int i = 0; i < objectsToConstraint.size(); i++)
+            {
+                // if(objectsToConstraint[i]->Tag[0] != 'B' && objectsToConstraint[i]->Tag[0] != 'F')
+                {
+                    objectsToConstraint[i]->Dimensions.y = SDL_clamp(objectsToConstraint[i]->Dimensions.y, .5f * objectsToConstraint[i]->Dimensions.x - 1250, .5f * objectsToConstraint[i]->Dimensions.x + 1530);
+                    objectsToConstraint[i]->Dimensions.y = SDL_clamp(objectsToConstraint[i]->Dimensions.y, -.5f * objectsToConstraint[i]->Dimensions.x + 1930, -.5f * objectsToConstraint[i]->Dimensions.x + 4670);
+                    objectsToConstraint[i]->Dimensions.x = SDL_clamp(objectsToConstraint[i]->Dimensions.x, 400, 5912);
+                }
+            }
         }
 };
