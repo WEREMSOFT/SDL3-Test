@@ -24,16 +24,9 @@ class MiddleLayer: public GameObject
                 float piggeonX = 2045.f + SDL_randf() * (3900.f - 2045.f);
                 float piggeonY = 906.f + SDL_randf() * (1991.f - 906.f);
                 auto& piggeon = piggeons.emplace_back(renderer, car);
-                // std::string piggeonShadowPath = "Assets/pigeonShadow.png";
-                // auto piggeonShadow = new GenericImage(renderer, piggeonShadowPath);
-                // piggeonShadow->Dimensions.x = 7;
-                // piggeonShadow->Dimensions.y = 20;
                 piggeon.Dimensions.x = piggeonX;
                 piggeon.Dimensions.y = piggeonY;
-                // piggeon.AddChild(piggeonShadow);
                 piggeon.Parent = this;
-
-                // AddChild(piggeon);
         }
     }
 

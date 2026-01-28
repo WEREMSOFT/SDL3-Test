@@ -68,6 +68,20 @@ class Piggeon: public MovingGameObject
             Texture = piggeonTexture;
         }
 
+        auto piggeonShadow = new GameObject();
+        piggeonShadow->Type = GameObjectTypeEnum::DRAWABLE;
+        piggeonShadow->Texture = Texture;
+        piggeonShadow->Dimensions.x = 0;
+        piggeonShadow->Dimensions.y = 0;
+        piggeonShadow->Dimensions.w = 32;
+        piggeonShadow->Dimensions.h = 32;
+        piggeonShadow->SourceRect.x = 0;
+        piggeonShadow->SourceRect.y = 128;
+        piggeonShadow->SourceRect.w = 32;
+        piggeonShadow->SourceRect.h = 32;
+
+        AddChild(piggeonShadow);
+
         Dimensions.h = Dimensions.w = SourceRect.h = SourceRect.w = 32;
         SourceRect.x = 0;
         SourceRect.y = 0;
@@ -120,8 +134,6 @@ class Piggeon: public MovingGameObject
 
                 velocityY += gravity * deltaTime;
                 Dimensions.y += velocityY * deltaTime ;
-
-                // printf("Velocity: %.2f\n", velocityY);
 
                 Vector2f vecIncrement = Scale(direction, Velocity * deltaTime);
                 Dimensions.x += vecIncrement.x;
