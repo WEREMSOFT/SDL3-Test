@@ -8,6 +8,7 @@ class MiddleLayer: public GameObject
 {
     std::vector<Piggeon> piggeons;
     public:
+    const int piggeonSideCount = 100000;
 
     MiddleLayer(SDL_Renderer *renderer, Car* car)
     {
@@ -16,7 +17,6 @@ class MiddleLayer: public GameObject
 
         AddChild(car);
 
-        const int piggeonSideCount = 70000;
         piggeons.reserve(piggeonSideCount);
 
         for(int i = 0; i < piggeonSideCount; i++)
@@ -51,5 +51,10 @@ class MiddleLayer: public GameObject
         for (Piggeon& p : piggeons) {
             p.Draw(renderer);
         }
+
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+        char fpsText[100] = {0};
+        snprintf(fpsText, 100, "number of piggeons: %d", piggeonSideCount);
+        SDL_RenderDebugText(renderer, 300, 20, fpsText);
     }
 };
