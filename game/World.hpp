@@ -31,7 +31,7 @@ class World: public GameObject
             _car->Dimensions.x = _backGround->Dimensions.w / 2.;
             _car->Dimensions.y = _backGround->Dimensions.h / 2.;
 
-            const int piggeonSideCount = 6000;
+            const int piggeonSideCount = 100000;
             _middleLayer = new GameObject();
             _middleLayer->Tag = "piggeonContainer";
             _middleLayer->Type = GameObjectTypeEnum::DRAWABLE;

@@ -33,13 +33,17 @@ class Piggeon: public MovingGameObject
     float baseY = 0;
     Vector2f direction = { 0, 1. };
 
+
     public:
+
+
     int Animation = (int)AnimationEnum::IDLE_2;
 
     int State = (int)State::IDLE;
 
     Piggeon(SDL_Renderer* renderer, Car* car)
     {
+        static SDL_Texture* piggeonTexture;
         _car = car;
         Tag = "Piggeon";
         Type = GameObjectTypeEnum::DRAWABLE;
@@ -47,26 +51,27 @@ class Piggeon: public MovingGameObject
         Velocity = 100.;
         AngularVelocity = 2.;
 
-        SDL_Point texture_size = {0};
+        if(piggeonTexture == NULL)
+        {
+            char* pngPath = NULL;
 
-        char* pngPath = NULL;
+            SDL_asprintf(&pngPath, "%sAssets/Pigeon.png", SDL_GetBasePath());
 
-        SDL_asprintf(&pngPath, "%sAssets/Pigeon.png", SDL_GetBasePath());
+            SDL_Surface* surface = SDL_LoadPNG(pngPath);
 
-        SDL_Surface* surface = SDL_LoadPNG(pngPath);
+            SDL_free(pngPath);
 
-        SDL_free(pngPath);
-
-        texture_size.x = surface->w;
-        texture_size.y = surface->h;
+            Texture = SDL_CreateTextureFromSurface(renderer, surface);
+            piggeonTexture = Texture;
+            SDL_DestroySurface(surface);
+        } else {
+            Texture = piggeonTexture;
+        }
 
         Dimensions.h = Dimensions.w = SourceRect.h = SourceRect.w = 32;
         SourceRect.x = 0;
         SourceRect.y = 0;
 
-        Texture = SDL_CreateTextureFromSurface(renderer, surface);
-
-        SDL_DestroySurface(surface);
     }
 
     void Update(float deltaTime) override
