@@ -31,7 +31,9 @@ class Piggeon: public MovingGameObject
     float elapsedIddleTime = 0;
     float velocityY = 0;
     float baseY = 0;
+    float baseDifferenceY = 0;
     Vector2f direction = { 0, 1. };
+    SDL_FRect shadowSource = {0};
 
 
     public:
@@ -68,19 +70,10 @@ class Piggeon: public MovingGameObject
             Texture = piggeonTexture;
         }
 
-        auto piggeonShadow = new GameObject();
-        piggeonShadow->Type = GameObjectTypeEnum::DRAWABLE;
-        piggeonShadow->Texture = Texture;
-        piggeonShadow->Dimensions.x = 0;
-        piggeonShadow->Dimensions.y = 0;
-        piggeonShadow->Dimensions.w = 32;
-        piggeonShadow->Dimensions.h = 32;
-        piggeonShadow->SourceRect.x = 0;
-        piggeonShadow->SourceRect.y = 128;
-        piggeonShadow->SourceRect.w = 32;
-        piggeonShadow->SourceRect.h = 32;
-
-        AddChild(piggeonShadow);
+        shadowSource.x = 0;
+        shadowSource.y = 128;
+        shadowSource.w = 32;
+        shadowSource.h = 32;
 
         Dimensions.h = Dimensions.w = SourceRect.h = SourceRect.w = 32;
         SourceRect.x = 0;
@@ -139,7 +132,7 @@ class Piggeon: public MovingGameObject
                 Dimensions.x += vecIncrement.x;
                 Dimensions.y += vecIncrement.y;
                 baseY += vecIncrement.y;
-
+                baseDifferenceY = baseY - Dimensions.y;
                 if(Dimensions.y > baseY)
                 {
                     velocityY = -15.;
@@ -163,23 +156,16 @@ class Piggeon: public MovingGameObject
 
     void Draw(SDL_Renderer* renderer) override
     {
-        auto dimensionTemp = Dimensions;
-        Dimensions.y = baseY;
-        for(int i = 0; i < Children.size(); i++)
-        {
-            if(Children[i]->Type == GameObjectTypeEnum::DRAWABLE)
-            {
-                Children[i]->Draw(renderer);
-            }
-        }
+        SDL_FRect worldPosition = GetWorldPositions();
 
-        Dimensions = dimensionTemp;
+        worldPosition.y += baseDifferenceY;
+
+        SDL_RenderTexture(renderer, Texture, &shadowSource, &worldPosition);
+
+        worldPosition.y -= baseDifferenceY;
 
         if(Texture != NULL)
         {
-            auto tempParent = Parent;
-            SDL_FRect worldPosition = GetWorldPositions();
-
             if(SourceRect.h == 0 || SourceRect.w == 0)
                 SDL_RenderTexture(renderer, Texture, NULL, &worldPosition);
             else
@@ -198,6 +184,7 @@ class Piggeon: public MovingGameObject
                 } else {
                     SDL_RenderTexture(renderer, Texture, &SourceRect, &worldPosition);
                 }
+
             }
         }
     }
