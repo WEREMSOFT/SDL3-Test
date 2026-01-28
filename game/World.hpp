@@ -4,6 +4,7 @@
 #include "BackGround.hpp"
 #include "ForeGround.hpp"
 #include "GenericImage.hpp"
+#include "MiddleLayer.hpp"
 #include "Piggeon.hpp"
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_stdinc.h>
@@ -13,7 +14,7 @@ class World: public GameObject
     SDL_Texture *texture = NULL;
     Car* _car;
     BackGround* _backGround;
-    GameObject* _middleLayer;
+    MiddleLayer* _middleLayer;
 
     public:
         World(SDL_Renderer* renderer)
@@ -31,26 +32,9 @@ class World: public GameObject
             _car->Dimensions.x = _backGround->Dimensions.w / 2.;
             _car->Dimensions.y = _backGround->Dimensions.h / 2.;
 
-            const int piggeonSideCount = 100000;
-            _middleLayer = new GameObject();
-            _middleLayer->Tag = "piggeonContainer";
-            _middleLayer->Type = GameObjectTypeEnum::DRAWABLE;
-            _middleLayer->AddChild(_car);
 
-            for(int i = 0; i < piggeonSideCount; i++)
-            {
-                    float piggeonX = 2045.f + SDL_randf() * (3900.f - 2045.f);
-                    float piggeonY = 906.f + SDL_randf() * (1991.f - 906.f);
-                    auto piggeon = new Piggeon(renderer, _car);
-                    std::string piggeonShadowPath = "Assets/pigeonShadow.png";
-                    auto piggeonShadow = new GenericImage(renderer, piggeonShadowPath);
-                    piggeonShadow->Dimensions.x = 7;
-                    piggeonShadow->Dimensions.y = 20;
-                    piggeon->Dimensions.x = piggeonX;
-                    piggeon->Dimensions.y = piggeonY;
-                    piggeon->AddChild(piggeonShadow);
-                    _middleLayer->AddChild(piggeon);
-            }
+            _middleLayer = new MiddleLayer(renderer, _car);
+
             AddChild(_middleLayer);
 
             auto treesFront = new ForeGround(renderer);
