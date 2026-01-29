@@ -75,21 +75,18 @@ class World: public GameObject
         {
             for(int i = 0; i < objectsToConstraint.size(); i++)
             {
-                // if(objectsToConstraint[i]->Tag[0] != 'B' && objectsToConstraint[i]->Tag[0] != 'F')
-                {
-                    objectsToConstraint[i]->Dimensions.y = SDL_clamp(objectsToConstraint[i]->Dimensions.y, .5f * objectsToConstraint[i]->Dimensions.x - 1250, .5f * objectsToConstraint[i]->Dimensions.x + 1530);
-                    objectsToConstraint[i]->Dimensions.y = SDL_clamp(objectsToConstraint[i]->Dimensions.y, -.5f * objectsToConstraint[i]->Dimensions.x + 1930, -.5f * objectsToConstraint[i]->Dimensions.x + 4670);
-                    objectsToConstraint[i]->Dimensions.x = SDL_clamp(objectsToConstraint[i]->Dimensions.x, 400, 5912);
-                }
+                objectsToConstraint[i]->Dimensions.y = SDL_clamp(objectsToConstraint[i]->Dimensions.y, .5f * objectsToConstraint[i]->Dimensions.x - 1250, .5f * objectsToConstraint[i]->Dimensions.x + 1530);
+                objectsToConstraint[i]->Dimensions.y = SDL_clamp(objectsToConstraint[i]->Dimensions.y, -.5f * objectsToConstraint[i]->Dimensions.x + 1930, -.5f * objectsToConstraint[i]->Dimensions.x + 4670);
+                objectsToConstraint[i]->Dimensions.x = SDL_clamp(objectsToConstraint[i]->Dimensions.x, 400, 5912);
             }
         }
 
-        void ConstraintObjectsToMap(std::vector<Piggeon>& objectsToConstraint)
+        void ConstraintObjectsToMap(std::vector<Piggeon*>& objectsToConstraint)
         {
-            for (Piggeon& piggeon : objectsToConstraint) {
-                piggeon.Dimensions.y = SDL_clamp(piggeon.Dimensions.y, .5f * piggeon.Dimensions.x - 1250, .5f * piggeon.Dimensions.x + 1530);
-                piggeon.Dimensions.y = SDL_clamp(piggeon.Dimensions.y, -.5f * piggeon.Dimensions.x + 1930, -.5f * piggeon.Dimensions.x + 4670);
-                piggeon.Dimensions.x = SDL_clamp(piggeon.Dimensions.x, 400, 5912);
+            for (Piggeon* piggeon : objectsToConstraint) {
+                piggeon->Dimensions.y = SDL_clamp(piggeon->Dimensions.y, .5f * piggeon->Dimensions.x - 1250, .5f * piggeon->Dimensions.x + 1530);
+                piggeon->Dimensions.y = SDL_clamp(piggeon->Dimensions.y, -.5f * piggeon->Dimensions.x + 1930, -.5f * piggeon->Dimensions.x + 4670);
+                piggeon->Dimensions.x = SDL_clamp(piggeon->Dimensions.x, 400, 5912);
             }
         }
 };

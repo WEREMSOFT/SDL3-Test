@@ -23,7 +23,7 @@ class Piggeon: public MovingGameObject
         COUNT
     };
 
-    const int NUM_FRAMES = 8;
+    int NUM_FRAMES = 8;
     SDL_FRect _prevDimensions = {0};
     Car *_car;
 
@@ -37,8 +37,6 @@ class Piggeon: public MovingGameObject
 
 
     public:
-
-
     int Animation = (int)AnimationEnum::IDLE_2;
 
     int State = (int)State::IDLE;
