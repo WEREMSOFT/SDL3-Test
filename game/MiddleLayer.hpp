@@ -9,7 +9,7 @@
 class MiddleLayer: public GameObject
 {
     public:
-    std::vector<Piggeon*> Piggeons;
+    std::vector<GameObject*> Piggeons;
     const int piggeonSideCount = 100000;
 
     MiddleLayer(SDL_Renderer *renderer, Car* car)
@@ -48,7 +48,7 @@ class MiddleLayer: public GameObject
             p->Update(deltaTime);
         }
 
-        std::sort(Piggeons.begin(), Piggeons.end(), [](const Piggeon* a, const Piggeon* b) {
+        std::sort(Piggeons.begin(), Piggeons.end(), [](const GameObject* a, const GameObject* b) {
             return a->Dimensions.y < b->Dimensions.y;
         });
     }
@@ -56,7 +56,7 @@ class MiddleLayer: public GameObject
     void Draw(SDL_Renderer* renderer) override
     {
         GameObject::Draw(renderer);
-        for (Piggeon* p : Piggeons) {
+        for (GameObject* p : Piggeons) {
             p->Draw(renderer);
         }
 
