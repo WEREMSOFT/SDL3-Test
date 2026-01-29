@@ -2,6 +2,7 @@
 #include "../core/GameObject.hpp"
 #include "GenericImage.hpp"
 #include "Piggeon.hpp"
+#include "Squirrel.hpp"
 #include <algorithm>
 #include <vector>
 #include <algorithm>
@@ -19,7 +20,7 @@ class MiddleLayer: public GameObject
 
         AddChild(car);
 
-        Piggeons.reserve(piggeonSideCount);
+        Piggeons.reserve(piggeonSideCount + 1);
 
         for(int i = 0; i < piggeonSideCount; i++)
         {
@@ -32,6 +33,17 @@ class MiddleLayer: public GameObject
                 piggeon->Dimensions.y = piggeonY;
                 piggeon->Parent = this;
         }
+
+        float piggeonX = car->Dimensions.x + (1991.f - 906.f) + 100;
+        float piggeonY = car->Dimensions.y;
+
+        car->Dimensions.x += (1991.f - 906.f) + 200;
+
+        auto squirrel = new Squirrel(renderer, car);
+        Piggeons.emplace_back(squirrel);
+        squirrel->Dimensions.x = piggeonX;
+        squirrel->Dimensions.y = piggeonY;
+        squirrel->Parent = this;
     }
 
     ~MiddleLayer()

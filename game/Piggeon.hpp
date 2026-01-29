@@ -6,6 +6,11 @@
 #include <cmath>
 #include <cstdlib>
 
+struct AnimationDefinition
+{
+    int frames;
+};
+
 class Piggeon: public MovingGameObject
 {
     enum class AnimationEnum
@@ -22,7 +27,7 @@ class Piggeon: public MovingGameObject
         FLYING,
         COUNT
     };
-
+    protected:
     int NUM_FRAMES = 8;
     SDL_FRect _prevDimensions = {0};
     Car *_car;
