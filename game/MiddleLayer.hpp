@@ -6,8 +6,8 @@
 
 class MiddleLayer: public GameObject
 {
-    std::vector<Piggeon> piggeons;
     public:
+    std::vector<Piggeon> Piggeons;
     const int piggeonSideCount = 100000;
 
     MiddleLayer(SDL_Renderer *renderer, Car* car)
@@ -17,13 +17,13 @@ class MiddleLayer: public GameObject
 
         AddChild(car);
 
-        piggeons.reserve(piggeonSideCount);
+        Piggeons.reserve(piggeonSideCount);
 
         for(int i = 0; i < piggeonSideCount; i++)
         {
                 float piggeonX = 2045.f + SDL_randf() * (3900.f - 2045.f);
                 float piggeonY = 906.f + SDL_randf() * (1991.f - 906.f);
-                auto& piggeon = piggeons.emplace_back(renderer, car);
+                auto& piggeon = Piggeons.emplace_back(renderer, car);
                 piggeon.Dimensions.x = piggeonX;
                 piggeon.Dimensions.y = piggeonY;
                 piggeon.Parent = this;
@@ -33,7 +33,7 @@ class MiddleLayer: public GameObject
     void Update(float deltaTime) override
     {
         GameObject::Update(deltaTime);
-        for (Piggeon& p : piggeons) {
+        for (Piggeon& p : Piggeons) {
             p.Update(deltaTime);
         }
     }
@@ -41,7 +41,7 @@ class MiddleLayer: public GameObject
     void Draw(SDL_Renderer* renderer) override
     {
         GameObject::Draw(renderer);
-        for (Piggeon& p : piggeons) {
+        for (Piggeon& p : Piggeons) {
             p.Draw(renderer);
         }
 
