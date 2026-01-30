@@ -40,7 +40,6 @@ class Piggeon: public MovingGameObject
     Vector2f direction = { 0, 1. };
     SDL_FRect shadowSource = {0};
 
-
     public:
     int Animation = (int)AnimationEnum::IDLE_2;
 
@@ -114,12 +113,13 @@ class Piggeon: public MovingGameObject
 
                 if(distance < 100.)
                 {
+                	distanceV = Normalize(distanceV);
                     State = (int)State::FLYING;
                     Animation = (int)AnimationEnum::FLYING;
                     baseY = Dimensions.y;
                     velocityY = -100.;
-                    Angle = SDL_randf() * (M_PI * 2.);
-                    direction = Rotate(direction, Angle);
+                    Angle = SDL_randf() * M_PI * 0.5 - M_PI * 0.25;
+                    direction = Rotate(distanceV, Angle);
                 }
 
                 break;

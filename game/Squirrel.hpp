@@ -70,15 +70,17 @@ class Squirrel: public Piggeon
                     Animation = (int)(random() % 2 == 0 ? AnimationEnum::IDLE_1 : AnimationEnum::IDLE_3);
                 }
 
-                if(distance < 100.)
+  	            if(distance < 100.)
                 {
+                	distanceV = Normalize(distanceV);
                     State = (int)State::FLYING;
                     Animation = (int)AnimationEnum::FLYING;
                     baseY = Dimensions.y;
                     velocityY = -100.;
-                    Angle = SDL_randf() * (M_PI * 2.);
-                    direction = Rotate(direction, Angle);
+                    Angle = SDL_randf() * M_PI * 0.5 - M_PI * 0.25;
+                    direction = Rotate(distanceV, Angle);
                 }
+
 
                 break;
             case (int)State::FLYING:
