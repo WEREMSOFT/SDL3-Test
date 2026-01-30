@@ -11,7 +11,7 @@ class MiddleLayer: public GameObject
 {
     public:
     std::vector<GameObject*> Piggeons;
-    const int piggeonSideCount = 50000;
+    const int piggeonSideCount = 100000;
 
     MiddleLayer(SDL_Renderer *renderer, Car* car)
     {
