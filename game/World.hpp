@@ -67,12 +67,9 @@ class World: public GameObject
         {
             GameObject::Update(deltaTime);
             auto carPosition = _car->GetWorldPositions();
+            // Camera follows car
             Dimensions.x = -_car->Dimensions.x + 412;
             Dimensions.y = -_car->Dimensions.y + 300;
-
-            // ConstraintObjectsToMap(_backGround->Children);
-            // ConstraintObjectsToMap(_middleLayer->Children);
-            // ConstraintObjectsToMap(_middleLayer->Piggeons);
         }
 
         void Draw(SDL_Renderer* renderer) override
@@ -86,24 +83,5 @@ class World: public GameObject
             snprintf(carPositionText, 300, "Car Position: %.2f, %.2f", _car->Dimensions.x, _car->Dimensions.y);
 
             SDL_RenderDebugText(renderer, 0, 40, carPositionText);
-        }
-
-        void ConstraintObjectsToMap(std::vector<GameObject*> objectsToConstraint)
-        {
-            for(int i = 0; i < objectsToConstraint.size(); i++)
-            {
-                objectsToConstraint[i]->Dimensions.y = SDL_clamp(objectsToConstraint[i]->Dimensions.y, .5f * objectsToConstraint[i]->Dimensions.x - 1250, .5f * objectsToConstraint[i]->Dimensions.x + 1530);
-                objectsToConstraint[i]->Dimensions.y = SDL_clamp(objectsToConstraint[i]->Dimensions.y, -.5f * objectsToConstraint[i]->Dimensions.x + 1930, -.5f * objectsToConstraint[i]->Dimensions.x + 4670);
-                objectsToConstraint[i]->Dimensions.x = SDL_clamp(objectsToConstraint[i]->Dimensions.x, 400, 5912);
-            }
-        }
-
-        void ConstraintObjectsToMap(std::vector<Piggeon*>& objectsToConstraint)
-        {
-            for (Piggeon* piggeon : objectsToConstraint) {
-                piggeon->Dimensions.y = SDL_clamp(piggeon->Dimensions.y, .5f * piggeon->Dimensions.x - 1250, .5f * piggeon->Dimensions.x + 1530);
-                piggeon->Dimensions.y = SDL_clamp(piggeon->Dimensions.y, -.5f * piggeon->Dimensions.x + 1930, -.5f * piggeon->Dimensions.x + 4670);
-                piggeon->Dimensions.x = SDL_clamp(piggeon->Dimensions.x, 400, 5912);
-            }
         }
 };

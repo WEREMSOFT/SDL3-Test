@@ -6,7 +6,7 @@
 #include <cstdlib>
 #include "Car.hpp"
 
-struct Paloma
+struct Animal
 {
     SDL_FRect Dimensions;
     SDL_FRect SourceRect;
@@ -41,17 +41,17 @@ class PalomaSystem: public GameObject
         COUNT
     };
 
-    float elapsedFrametime;
+    float elapsedFrametime = 0;
     Car* _car;
     SDL_FRect shadowSource = {0};
 
     public:
 
-    Paloma* Palomas;
+    Animal* Palomas;
     SDL_Texture* Texture;
     PalomaSystem(SDL_Texture* texture, Car* car)
     {
-        Palomas = (Paloma*) calloc(ENTITY_COUNT, sizeof(Paloma));
+        Palomas = (Animal*) calloc(ENTITY_COUNT, sizeof(Animal));
         Texture = texture;
         Type = GameObjectTypeEnum::DRAWABLE;
         _car = car;
@@ -66,7 +66,7 @@ class PalomaSystem: public GameObject
         shadowSource.w = 32;
         shadowSource.h = 32;
 
-        qsort(Palomas, ENTITY_COUNT, sizeof(Paloma), comparePaloma);
+        qsort(Palomas, ENTITY_COUNT, sizeof(Animal), comparePaloma);
     }
 
     ~PalomaSystem()
@@ -82,14 +82,15 @@ class PalomaSystem: public GameObject
         {
             UpdatePaloma(&Palomas[i], deltaTime);
         }
+
         if(elapsedFrametime > 0.1)
         {
             elapsedFrametime = 0;
+            qsort(Palomas, ENTITY_COUNT, sizeof(Animal), comparePaloma);
         }
-        qsort(Palomas, ENTITY_COUNT, sizeof(Paloma), comparePaloma);
     }
 
-    void UpdatePaloma(Paloma* paloma, float deltaTime)
+    void UpdatePaloma(Animal* paloma, float deltaTime)
     {
         paloma->elapsedIddleTime += deltaTime;
         paloma->SourceRect.y = 32 * paloma->Animation;
@@ -144,6 +145,10 @@ class PalomaSystem: public GameObject
                 }
         }
 
+        paloma->Dimensions.y = SDL_clamp(paloma->Dimensions.y, .5f * paloma->Dimensions.x - 1250, .5f * paloma->Dimensions.x + 1530);
+        paloma->Dimensions.y = SDL_clamp(paloma->Dimensions.y, -.5f * paloma->Dimensions.x + 1930, -.5f * paloma->Dimensions.x + 4670);
+        paloma->Dimensions.x = SDL_clamp(paloma->Dimensions.x, 400, 5912);
+
         if(elapsedFrametime > 0.1)
         {
             paloma->SourceRect.x += 32;
@@ -164,15 +169,15 @@ class PalomaSystem: public GameObject
 
     static int comparePaloma(const void* a, const void* b)
     {
-        const Paloma* pa = (const Paloma*)a;
-        const Paloma* pb = (const Paloma*)b;
+        const Animal* pa = (const Animal*)a;
+        const Animal* pb = (const Animal*)b;
 
         if (pa->Dimensions.y < pb->Dimensions.y) return -1;
         if (pa->Dimensions.y > pb->Dimensions.y) return 1;
         return 0;
     }
 
-    void initPaloma(Paloma* paloma)
+    void initPaloma(Animal* paloma)
     {
         paloma->Velocity = 100.;
         paloma->Dimensions.h = paloma->Dimensions.w = paloma->SourceRect.h = paloma->SourceRect.w = 32;
@@ -186,7 +191,7 @@ class PalomaSystem: public GameObject
         paloma->Dimensions.y = piggeonY;
     }
 
-    void DrawPaloma(Paloma* paloma, SDL_Renderer *renderer)
+    void DrawPaloma(Animal* paloma, SDL_Renderer *renderer)
     {
         SDL_FRect worldPosition = GetWorldPositionsPaloma(paloma);
 
@@ -212,7 +217,7 @@ class PalomaSystem: public GameObject
         }
     }
 
-    SDL_FRect GetWorldPositionsPaloma(Paloma* paloma)
+    SDL_FRect GetWorldPositionsPaloma(Animal* paloma)
     {
         auto tempParent = Parent;
         SDL_FRect worldPosition = { paloma->Dimensions.x, paloma->Dimensions.y, paloma->Dimensions.w, paloma->Dimensions.h};
@@ -223,5 +228,14 @@ class PalomaSystem: public GameObject
             tempParent = tempParent->Parent;
         }
         return worldPosition;
+    }
+
+    void ConstraintObjectsToMap()
+    {
+        for (int i = 0; i < ENTITY_COUNT; i++) {
+            Palomas[i].Dimensions.y = SDL_clamp(Palomas[i].Dimensions.y, .5f * Palomas[i].Dimensions.x - 1250, .5f * Palomas[i].Dimensions.x + 1530);
+            Palomas[i].Dimensions.y = SDL_clamp(Palomas[i].Dimensions.y, -.5f * Palomas[i].Dimensions.x + 1930, -.5f * Palomas[i].Dimensions.x + 4670);
+            Palomas[i].Dimensions.x = SDL_clamp(Palomas[i].Dimensions.x, 400, 5912);
+        }
     }
 };
