@@ -5,6 +5,7 @@
 #include "ForeGround.hpp"
 #include "GenericImage.hpp"
 #include "MiddleLayer.hpp"
+#include "PalomaSystem.hpp"
 #include "Piggeon.hpp"
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_stdinc.h>
@@ -14,7 +15,8 @@ class World: public GameObject
     SDL_Texture *texture = NULL;
     Car* _car;
     BackGround* _backGround;
-    MiddleLayer* _middleLayer;
+    PalomaSystem* _palomaSystem;
+    // MiddleLayer* _middleLayer;
 
     public:
         World(SDL_Renderer* renderer)
@@ -32,10 +34,24 @@ class World: public GameObject
             _car->Dimensions.x = _backGround->Dimensions.w / 2.;
             _car->Dimensions.y = _backGround->Dimensions.h / 2.;
 
+            char* pngPath = NULL;
 
-            _middleLayer = new MiddleLayer(renderer, _car);
+            SDL_asprintf(&pngPath, "%sAssets/Pigeon.png", SDL_GetBasePath());
 
-            AddChild(_middleLayer);
+            SDL_Surface* surface = SDL_LoadPNG(pngPath);
+
+            SDL_free(pngPath);
+
+            Texture = SDL_CreateTextureFromSurface(renderer, surface);
+            _palomaSystem = new PalomaSystem(Texture, _car);
+            SDL_DestroySurface(surface);
+
+            AddChild(_car);
+            AddChild(_palomaSystem);
+
+            // _middleLayer = new MiddleLayer(renderer, _car);
+
+            // AddChild(_middleLayer);
 
             auto treesFront = new ForeGround(renderer);
             AddChild(treesFront);
@@ -43,6 +59,7 @@ class World: public GameObject
 
         ~World()
         {
+            SDL_DestroyTexture(Texture);
             printf("destroying world\n");
         }
 
@@ -54,8 +71,8 @@ class World: public GameObject
             Dimensions.y = -_car->Dimensions.y + 300;
 
             // ConstraintObjectsToMap(_backGround->Children);
-            ConstraintObjectsToMap(_middleLayer->Children);
-            ConstraintObjectsToMap(_middleLayer->Piggeons);
+            // ConstraintObjectsToMap(_middleLayer->Children);
+            // ConstraintObjectsToMap(_middleLayer->Piggeons);
         }
 
         void Draw(SDL_Renderer* renderer) override

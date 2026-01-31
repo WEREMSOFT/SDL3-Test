@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <vector>
 #include <algorithm>
+#include "PalomaSystem.hpp"
 
 class MiddleLayer: public GameObject
 {
