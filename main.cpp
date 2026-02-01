@@ -136,7 +136,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
     average /= FPS_HISTORY;
 
-    snprintf(fpsText, 100, "fps: %.0f", average);
+    snprintf(fpsText, 100, "fps: %.3f", average);
     SDL_RenderDebugText(renderer, 300, 0, fpsText);
 
     SDL_RenderPresent(renderer);  /* put it all on the screen! */
