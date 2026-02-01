@@ -6,6 +6,37 @@
 #include <cstdlib>
 #include "Car.hpp"
 
+struct AnimationDefinition
+{
+    int frames;
+};
+
+enum class SquirrelAnimationEnum
+{
+    IDLE_1 = 0,
+    IDLE_2,
+    FLYING,
+    WALKING,
+    IDLE_3,
+    COUNT
+};
+
+enum class PiggeonAnimationEnum
+{
+    IDLE_1,
+    WALKING,
+    IDLE_2,
+    FLYING,
+    COUNT
+};
+
+
+enum AnimalTypeEnum
+{
+    Piggeon,
+    Squirrel
+};
+
 struct Animal
 {
     SDL_FRect Dimensions;
@@ -13,7 +44,7 @@ struct Animal
     Vector2f direction;
     int Animation;
     int State;
-    int Type;
+    AnimalTypeEnum Type;
     float elapsedIddleTime;
     float baseY;
     float Angle;
@@ -22,18 +53,10 @@ struct Animal
     float Velocity;
 };
 
-#define ENTITY_COUNT 100000
+#define ENTITY_COUNT 100001
 
 class PalomaSystem: public GameObject
 {
-    enum class AnimationEnum
-    {
-        IDLE_1,
-        WALKING,
-        IDLE_2,
-        FLYING,
-        COUNT
-    };
 
     enum class State{
         IDLE,
@@ -44,6 +67,8 @@ class PalomaSystem: public GameObject
     float elapsedFrametime = 0;
     Car* _car;
     SDL_FRect shadowSource = {0};
+    AnimationDefinition squirrelAnimations[(int)SquirrelAnimationEnum::COUNT] = {0};
+
 
     public:
 
@@ -56,10 +81,12 @@ class PalomaSystem: public GameObject
         Type = GameObjectTypeEnum::DRAWABLE;
         _car = car;
 
-        for(int i = 0; i < ENTITY_COUNT; i++)
+        for(int i = 0; i < ENTITY_COUNT - 1; i++)
         {
-            initPaloma(&Palomas[i]);
+            InitPaloma(&Palomas[i]);
         }
+
+        InitSquirrel(&Palomas[ENTITY_COUNT-1]);
 
         shadowSource.x = 0;
         shadowSource.y = 128;
@@ -67,6 +94,11 @@ class PalomaSystem: public GameObject
         shadowSource.h = 32;
 
         qsort(Palomas, ENTITY_COUNT, sizeof(Animal), comparePaloma);
+
+        squirrelAnimations[(int)SquirrelAnimationEnum::IDLE_1].frames = 5;
+        squirrelAnimations[(int)SquirrelAnimationEnum::IDLE_2].frames = 5;
+        squirrelAnimations[(int)SquirrelAnimationEnum::IDLE_3].frames = 1;
+        squirrelAnimations[(int)SquirrelAnimationEnum::FLYING].frames = 7;
     }
 
     ~PalomaSystem()
@@ -80,13 +112,88 @@ class PalomaSystem: public GameObject
 
         for(int i = 0; i < ENTITY_COUNT; i++)
         {
-            UpdatePaloma(&Palomas[i], deltaTime);
+            switch(Palomas[i].Type)
+            {
+                case AnimalTypeEnum::Piggeon:
+                    UpdatePaloma(&Palomas[i], deltaTime);
+                    break;
+                case AnimalTypeEnum::Squirrel:
+                    UpdateSquirrel(&Palomas[i], deltaTime);
+                    break;
+            }
         }
 
         if(elapsedFrametime > 0.1)
         {
             elapsedFrametime = 0;
             qsort(Palomas, ENTITY_COUNT, sizeof(Animal), comparePaloma);
+        }
+    }
+
+    void UpdateSquirrel(Animal* squirrel, float deltaTime)
+    {
+        static const int FrameStart = 128 + 32;
+        squirrel->SourceRect.y = 32 * squirrel->Animation + FrameStart;
+
+        Vector2f distanceV;
+        float distance;
+
+        if(squirrel->baseY == 0)
+        {
+            squirrel->baseY = squirrel->Dimensions.y;
+        }
+
+        distanceV = (Vector2f){ squirrel->Dimensions.x - (_car->Dimensions.x + _car->Dimensions.w * .5f), squirrel->Dimensions.y - (_car->Dimensions.y + _car->Dimensions.h * .5f) };
+        distance = Length(distanceV);
+
+        switch (squirrel->State) {
+            case int(State::IDLE):
+                if(squirrel->elapsedIddleTime > 2.)
+                {
+                    squirrel->elapsedIddleTime = 0;
+                    squirrel->Animation = (int)(random() % 2 == 0 ? SquirrelAnimationEnum::IDLE_1 : SquirrelAnimationEnum::IDLE_3);
+                }
+
+  	            if(distance < 100.)
+                {
+                	distanceV = Normalize(distanceV);
+                    squirrel->State = (int)State::FLYING;
+                    squirrel->Animation = (int)SquirrelAnimationEnum::FLYING;
+                    squirrel->baseY = squirrel->Dimensions.y;
+                    squirrel->velocityY = -100.;
+                    squirrel->Angle = SDL_randf() * M_PI * 0.5 - M_PI * 0.25;
+                    squirrel->direction = Rotate(distanceV, squirrel->Angle);
+                }
+
+
+                break;
+            case (int)State::FLYING:
+                const float gravity = 50.8;
+
+                squirrel->velocityY += gravity * deltaTime;
+                squirrel->Dimensions.y += squirrel->velocityY * deltaTime ;
+
+                Vector2f vecIncrement = Scale(squirrel->direction, squirrel->Velocity * deltaTime);
+                squirrel->Dimensions.x += vecIncrement.x;
+                squirrel->Dimensions.y += vecIncrement.y;
+                squirrel->baseY += vecIncrement.y;
+                squirrel->baseDifferenceY = squirrel->baseY - squirrel->Dimensions.y;
+                if(squirrel->Dimensions.y > squirrel->baseY)
+                {
+                    squirrel->velocityY = -15.;
+                    squirrel->Dimensions.y = squirrel->baseY;
+                    squirrel->State = (int)State::IDLE;
+                }
+        }
+
+
+        if(elapsedFrametime > 0.1)
+        {
+            squirrel->SourceRect.x += 32;
+            if(squirrel->SourceRect.x > (32 * squirrelAnimations[squirrel->Animation].frames))
+            {
+                squirrel->SourceRect.x = 0;
+            }
         }
     }
 
@@ -111,14 +218,14 @@ class PalomaSystem: public GameObject
                 if(paloma->elapsedIddleTime > 2.)
                 {
                     paloma->elapsedIddleTime = 0;
-                    paloma->Animation = (int)(random() % 2 == 0 ? AnimationEnum::IDLE_1 : AnimationEnum::IDLE_2);
+                    paloma->Animation = (int)(random() % 2 == 0 ? PiggeonAnimationEnum::IDLE_1 : PiggeonAnimationEnum::IDLE_2);
                 }
 
                 if(distance < 100.)
                 {
                 	distanceV = Normalize(distanceV);
                     paloma->State = (int)State::FLYING;
-                    paloma->Animation = (int)AnimationEnum::FLYING;
+                    paloma->Animation = (int)PiggeonAnimationEnum::FLYING;
                     paloma->baseY = paloma->Dimensions.y;
                     paloma->velocityY = -100.;
                     paloma->Angle = SDL_randf() * M_PI * 0.5 - M_PI * 0.25;
@@ -177,8 +284,23 @@ class PalomaSystem: public GameObject
         return 0;
     }
 
-    void initPaloma(Animal* paloma)
+    void InitSquirrel(Animal* squirrel)
     {
+        squirrel->Type = AnimalTypeEnum::Squirrel;
+        squirrel->Animation = (int)SquirrelAnimationEnum::IDLE_3;
+
+        squirrel->Velocity = 100.;
+        squirrel->Dimensions.h = squirrel->Dimensions.w = squirrel->SourceRect.h = squirrel->SourceRect.w = 32;
+        squirrel->SourceRect.x = 0;
+        squirrel->SourceRect.y = 0;
+
+        squirrel->Dimensions.x = _car->Dimensions.x - 100;
+        squirrel->Dimensions.y = _car->Dimensions.y;
+    }
+
+    void InitPaloma(Animal* paloma)
+    {
+        paloma->Type = AnimalTypeEnum::Piggeon;
         paloma->Velocity = 100.;
         paloma->Dimensions.h = paloma->Dimensions.w = paloma->SourceRect.h = paloma->SourceRect.w = 32;
         paloma->SourceRect.x = 0;

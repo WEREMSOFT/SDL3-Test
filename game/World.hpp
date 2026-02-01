@@ -3,10 +3,7 @@
 #include "Car.hpp"
 #include "BackGround.hpp"
 #include "ForeGround.hpp"
-#include "GenericImage.hpp"
-#include "MiddleLayer.hpp"
 #include "PalomaSystem.hpp"
-#include "Piggeon.hpp"
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_stdinc.h>
 
@@ -33,6 +30,8 @@ class World: public GameObject
             _car = new Car(renderer);
             _car->Dimensions.x = _backGround->Dimensions.w / 2.;
             _car->Dimensions.y = _backGround->Dimensions.h / 2.;
+
+            _car->Dimensions.x += (1991.f - 906.f) + 200;
 
             char* pngPath = NULL;
 

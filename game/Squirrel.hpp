@@ -1,5 +1,4 @@
 #pragma once
-#include "MovingGameObject.hpp"
 #include "Car.hpp"
 #include "Piggeon.hpp"
 #include <SDL3/SDL_mutex.h>
