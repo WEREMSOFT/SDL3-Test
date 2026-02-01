@@ -48,10 +48,6 @@ class World: public GameObject
             AddChild(_car);
             AddChild(_palomaSystem);
 
-            // _middleLayer = new MiddleLayer(renderer, _car);
-
-            // AddChild(_middleLayer);
-
             auto treesFront = new ForeGround(renderer);
             AddChild(treesFront);
         }
