@@ -3,9 +3,7 @@
 #include "Car.hpp"
 #include "BackGround.hpp"
 #include "ForeGround.hpp"
-#include "GenericImage.hpp"
-#include "MiddleLayer.hpp"
-#include "Piggeon.hpp"
+#include "PalomaSystem.hpp"
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_stdinc.h>
 
@@ -14,7 +12,8 @@ class World: public GameObject
     SDL_Texture *texture = NULL;
     Car* _car;
     BackGround* _backGround;
-    MiddleLayer* _middleLayer;
+    PalomaSystem* _palomaSystem;
+    // MiddleLayer* _middleLayer;
 
     public:
         World(SDL_Renderer* renderer)
@@ -32,10 +31,26 @@ class World: public GameObject
             _car->Dimensions.x = _backGround->Dimensions.w / 2.;
             _car->Dimensions.y = _backGround->Dimensions.h / 2.;
 
+            _car->Dimensions.x += (1991.f - 906.f) + 200;
 
-            _middleLayer = new MiddleLayer(renderer, _car);
+            char* pngPath = NULL;
 
-            AddChild(_middleLayer);
+            SDL_asprintf(&pngPath, "%sAssets/Pigeon.png", SDL_GetBasePath());
+
+            SDL_Surface* surface = SDL_LoadPNG(pngPath);
+
+            SDL_free(pngPath);
+
+            Texture = SDL_CreateTextureFromSurface(renderer, surface);
+            _palomaSystem = new PalomaSystem(Texture, _car);
+            SDL_DestroySurface(surface);
+
+            AddChild(_car);
+            AddChild(_palomaSystem);
+
+            // _middleLayer = new MiddleLayer(renderer, _car);
+
+            // AddChild(_middleLayer);
 
             auto treesFront = new ForeGround(renderer);
             AddChild(treesFront);
@@ -43,6 +58,7 @@ class World: public GameObject
 
         ~World()
         {
+            SDL_DestroyTexture(Texture);
             printf("destroying world\n");
         }
 
@@ -50,12 +66,9 @@ class World: public GameObject
         {
             GameObject::Update(deltaTime);
             auto carPosition = _car->GetWorldPositions();
+            // Camera follows car
             Dimensions.x = -_car->Dimensions.x + 412;
             Dimensions.y = -_car->Dimensions.y + 300;
-
-            // ConstraintObjectsToMap(_backGround->Children);
-            ConstraintObjectsToMap(_middleLayer->Children);
-            ConstraintObjectsToMap(_middleLayer->Piggeons);
         }
 
         void Draw(SDL_Renderer* renderer) override
@@ -69,24 +82,5 @@ class World: public GameObject
             snprintf(carPositionText, 300, "Car Position: %.2f, %.2f", _car->Dimensions.x, _car->Dimensions.y);
 
             SDL_RenderDebugText(renderer, 0, 40, carPositionText);
-        }
-
-        void ConstraintObjectsToMap(std::vector<GameObject*> objectsToConstraint)
-        {
-            for(int i = 0; i < objectsToConstraint.size(); i++)
-            {
-                objectsToConstraint[i]->Dimensions.y = SDL_clamp(objectsToConstraint[i]->Dimensions.y, .5f * objectsToConstraint[i]->Dimensions.x - 1250, .5f * objectsToConstraint[i]->Dimensions.x + 1530);
-                objectsToConstraint[i]->Dimensions.y = SDL_clamp(objectsToConstraint[i]->Dimensions.y, -.5f * objectsToConstraint[i]->Dimensions.x + 1930, -.5f * objectsToConstraint[i]->Dimensions.x + 4670);
-                objectsToConstraint[i]->Dimensions.x = SDL_clamp(objectsToConstraint[i]->Dimensions.x, 400, 5912);
-            }
-        }
-
-        void ConstraintObjectsToMap(std::vector<Piggeon*>& objectsToConstraint)
-        {
-            for (Piggeon* piggeon : objectsToConstraint) {
-                piggeon->Dimensions.y = SDL_clamp(piggeon->Dimensions.y, .5f * piggeon->Dimensions.x - 1250, .5f * piggeon->Dimensions.x + 1530);
-                piggeon->Dimensions.y = SDL_clamp(piggeon->Dimensions.y, -.5f * piggeon->Dimensions.x + 1930, -.5f * piggeon->Dimensions.x + 4670);
-                piggeon->Dimensions.x = SDL_clamp(piggeon->Dimensions.x, 400, 5912);
-            }
         }
 };

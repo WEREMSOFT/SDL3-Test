@@ -36,6 +36,9 @@ Uint64 last = SDL_GetPerformanceCounter();
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
 
+    printf("int %lu\n", sizeof(int));
+    printf("float %lu\n", sizeof(float));
+
     const int compiled = SDL_VERSION;  /* hardcoded number from SDL headers */
     const int linked = SDL_GetVersion();  /* reported by linked SDL library */
 
