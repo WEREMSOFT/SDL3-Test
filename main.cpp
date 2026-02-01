@@ -119,7 +119,24 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
     char fpsText[100] = {0};
-    snprintf(fpsText, 100, "fps: %.2f", 1.f / deltaTime);
+
+    #define FPS_HISTORY 50
+    static float fps[FPS_HISTORY] = {0};
+    static int fpsCounter = 0;
+    fpsCounter++;
+    fpsCounter %= FPS_HISTORY;
+    fps[fpsCounter] = 1.f / deltaTime;
+
+    float average = 0.;
+
+    for(int i = 0; i < FPS_HISTORY; i++)
+    {
+        average += fps[i];
+    }
+
+    average /= FPS_HISTORY;
+
+    snprintf(fpsText, 100, "fps: %.0f", average);
     SDL_RenderDebugText(renderer, 300, 0, fpsText);
 
     SDL_RenderPresent(renderer);  /* put it all on the screen! */
