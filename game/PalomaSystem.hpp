@@ -133,6 +133,7 @@ class PalomaSystem: public GameObject
     void UpdateSquirrel(Animal* squirrel, float deltaTime)
     {
         static const int FrameStart = 128 + 32;
+        squirrel->elapsedIddleTime += deltaTime;
         squirrel->SourceRect.y = 32 * squirrel->Animation + FrameStart;
 
         Vector2f distanceV;
