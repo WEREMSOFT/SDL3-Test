@@ -74,11 +74,11 @@ class Piggeon
                     paloma->Dimensions.y = paloma->baseY;
                     paloma->State = (int)State::IDLE;
                 }
-        }
 
-        paloma->Dimensions.y = SDL_clamp(paloma->Dimensions.y, .5f * paloma->Dimensions.x - 1250, .5f * paloma->Dimensions.x + 1530);
-        paloma->Dimensions.y = SDL_clamp(paloma->Dimensions.y, -.5f * paloma->Dimensions.x + 1930, -.5f * paloma->Dimensions.x + 4670);
-        paloma->Dimensions.x = SDL_clamp(paloma->Dimensions.x, 400, 5912);
+                paloma->Dimensions.y = SDL_clamp(paloma->Dimensions.y, .5f * paloma->Dimensions.x - 1250, .5f * paloma->Dimensions.x + 1530);
+                paloma->Dimensions.y = SDL_clamp(paloma->Dimensions.y, -.5f * paloma->Dimensions.x + 1930, -.5f * paloma->Dimensions.x + 4670);
+                paloma->Dimensions.x = SDL_clamp(paloma->Dimensions.x, 400, 5912);
+        }
 
         if(elapsedFrametime > 0.1)
         {

@@ -101,6 +101,8 @@ class PalomaSystem: public GameObject
 
         worldPosition.y += paloma->baseDifferenceY;
 
+        if(worldPosition.x < -10 || worldPosition.y < -10 || worldPosition.x > 800 || worldPosition.y > 700) return;
+
         SDL_RenderTexture(renderer, Texture, &shadowSource, &worldPosition);
 
         worldPosition.y -= paloma->baseDifferenceY;
