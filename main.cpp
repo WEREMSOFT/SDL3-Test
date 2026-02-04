@@ -1,30 +1,20 @@
-/* primitives.c ... */
-
-/*
- * This example creates an SDL window and renderer, and then draws some lines,
- * rectangles and points to it every frame.
- *
- * This code is public domain. Feel free to use it for any purpose!
- */
- #include <SDL3/SDL_events.h>
- #include <SDL3/SDL_filesystem.h>
+#include <SDL3/SDL_events.h>
+#include <SDL3/SDL_filesystem.h>
 #include <SDL3/SDL_hints.h>
- #include <SDL3/SDL_init.h>
- #include <SDL3/SDL_rect.h>
- #include <SDL3/SDL_render.h>
- #include <SDL3/SDL_scancode.h>
- #include <SDL3/SDL_stdinc.h>
- #include <SDL3/SDL_surface.h>
- #include <SDL3/SDL_timer.h>
+#include <SDL3/SDL_init.h>
+#include <SDL3/SDL_rect.h>
+#include <SDL3/SDL_render.h>
+#include <SDL3/SDL_scancode.h>
+#include <SDL3/SDL_stdinc.h>
+#include <SDL3/SDL_surface.h>
+#include <SDL3/SDL_timer.h>
 #include <cstdio>
- #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
- #include <SDL3/SDL.h>
- #include <SDL3/SDL_main.h>
+#define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
 SDL_COMPILE_TIME_ASSERT(SDL_Version, SDL_VERSION_ATLEAST(3, 4, 0));
 #include "game/World.hpp"
-
 #include <math.h>
-
 
 /* We will use this renderer to draw into this window every frame. */
 static SDL_Window *window = NULL;
@@ -102,26 +92,14 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
-SDL_AppResult SDL_AppIterate(void *appstate)
+void printFPSInformation(SDL_Renderer* renderer, float deltaTime)
 {
-    Uint64 now = SDL_GetPerformanceCounter();
-    double deltaTime =
-        (double)(now - last) / (double)SDL_GetPerformanceFrequency();
-    last = now;
-
-    SDL_SetRenderDrawColor(renderer, 15, 50, 90, SDL_ALPHA_OPAQUE);  /* dark gray, full alpha */
-    SDL_RenderClear(renderer);  /* start with a blank canvas. */
-
-    World* world = (World *)appstate;
-
-    world->Update(deltaTime);
-    world->Draw(renderer);
-
+    #define FPS_HISTORY 50
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
     char fpsText[100] = {0};
-
-    #define FPS_HISTORY 50
+    char frameTimeText[100] = {0};
     static float fps[FPS_HISTORY] = {0};
+
     static int fpsCounter = 0;
     fpsCounter++;
     fpsCounter %= FPS_HISTORY;
@@ -138,6 +116,28 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
     snprintf(fpsText, 100, "fps: %.3f", average);
     SDL_RenderDebugText(renderer, 300, 0, fpsText);
+    
+    snprintf(frameTimeText, 100, "frameTime: %.3f", deltaTime);
+    SDL_RenderDebugText(renderer, 300, 20, frameTimeText);
+
+}
+
+SDL_AppResult SDL_AppIterate(void *appstate)
+{
+    Uint64 now = SDL_GetPerformanceCounter();
+    double deltaTime =
+        (double)(now - last) / (double)SDL_GetPerformanceFrequency();
+    last = now;
+
+    SDL_SetRenderDrawColor(renderer, 15, 50, 90, SDL_ALPHA_OPAQUE);  /* dark gray, full alpha */
+    SDL_RenderClear(renderer);  /* start with a blank canvas. */
+
+    World* world = (World *)appstate;
+
+    world->Update(deltaTime);
+    world->Draw(renderer);
+
+    printFPSInformation(renderer, deltaTime);
 
     SDL_RenderPresent(renderer);  /* put it all on the screen! */
 
