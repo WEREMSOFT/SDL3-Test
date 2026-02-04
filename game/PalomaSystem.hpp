@@ -53,6 +53,89 @@ class PalomaSystem: public GameObject
         free(Palomas);
     }
 
+    // // Custom Sort Algorithm
+    // int partition(Animal arr[], int low, int high)
+    // {
+    //     // Initilize pivot to the first element
+    //     auto p = arr[low];
+    //     int i = low;
+    //     int j = high;
+
+    //     while(i < j)
+    //     {
+    //         while(arr[i].Dimensions.y <= p.Dimensions.y && i <= high - 1)
+    //         {
+    //             i++;
+    //         }
+    //         while(arr[j].Dimensions.y > p.Dimensions.y && j >= low + 1)
+    //         {
+    //             j--;
+    //         }
+    //         if(i < j)
+    //         {
+    //             auto value = arr[i];
+    //             arr[i] = arr[j];
+    //             arr[j] = value;
+    //         }
+    //     }
+    //     auto value = arr[low];
+    //     arr[low] = arr[j];
+    //     arr[j] = value;
+    //     return j;
+    // }
+
+    // void QuickSort(Animal arr[], int low, int high)
+    // {
+    //     if(low < high)
+    //     {
+    //         int pi = partition(arr, low, high);
+
+    //         QuickSort(arr, low, pi - 1);
+    //         QuickSort(arr, pi + 1, high);
+    //     }
+    // }
+
+    int partition(Animal arr[], int low, int high)
+    {
+        // Initilize pivot to the first element
+        auto p = arr[low];
+        int i = low;
+        int j = high;
+
+        while(i < j)
+        {
+            while(arr[i].Angle <= p.Angle && i <= high - 1)
+            {
+                i++;
+            }
+            while(arr[j].Angle > p.Angle && j >= low + 1)
+            {
+                j--;
+            }
+            if(i < j)
+            {
+                auto value = arr[i];
+                arr[i] = arr[j];
+                arr[j] = value;
+            }
+        }
+        auto value = arr[low];
+        arr[low] = arr[j];
+        arr[j] = value;
+        return j;
+    }
+
+    void QuickSort(Animal arr[], int low, int high)
+    {
+        if(low < high)
+        {
+            int pi = partition(arr, low, high);
+
+            QuickSort(arr, low, pi - 1);
+            QuickSort(arr, pi + 1, high);
+        }
+    }
+
     void Update(float deltaTime) override
     {
         elapsedFrametime += deltaTime;
@@ -73,7 +156,8 @@ class PalomaSystem: public GameObject
         if(elapsedFrametime > 0.1)
         {
             elapsedFrametime = 0;
-            qsort(Palomas, ENTITY_COUNT, sizeof(Animal), comparePaloma);
+            // qsort(Palomas, ENTITY_COUNT, sizeof(Animal), comparePaloma);
+            QuickSort(Palomas, 0, ENTITY_COUNT - 1);
         }
     }
 
