@@ -19,6 +19,11 @@ class BackGround: public GameObject
 
         SDL_Surface* surface = SDL_LoadPNG(pngPath);
 
+        if(surface == NULL)
+        {
+        	printf("Error loading texture %s\n", SDL_GetError());
+        }
+
         SDL_free(pngPath);
 
         texture_size.x = surface->w;
