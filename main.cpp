@@ -15,6 +15,11 @@
 SDL_COMPILE_TIME_ASSERT(SDL_Version, SDL_VERSION_ATLEAST(3, 4, 0));
 #include "game/World.hpp"
 #include <math.h>
+#include "DebugFlags.h"
+
+#ifndef FORCE_VULKAN
+#include <SDL3/SDL_opengl.h>
+#endif
 
 /* We will use this renderer to draw into this window every frame. */
 static SDL_Window *window = NULL;
@@ -25,9 +30,6 @@ Uint64 last = SDL_GetPerformanceCounter();
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
-
-    printf("int %lu\n", sizeof(int));
-    printf("float %lu\n", sizeof(float));
 
     const int compiled = SDL_VERSION;  /* hardcoded number from SDL headers */
     const int linked = SDL_GetVersion();  /* reported by linked SDL library */
@@ -42,8 +44,6 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
             SDL_VERSIONNUM_MINOR(linked),
             SDL_VERSIONNUM_MICRO(linked));
 
-    int i;
-
     SDL_SetAppMetadata("SDL3 Test", "1.0", "none");
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -52,7 +52,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
                         SDL_GL_CONTEXT_PROFILE_CORE);
 
-    // SDL_SetHint(SDL_HINT_RENDER_DRIVER, "vulkan");
+#ifdef FORCE_VULKAN
+	 SDL_SetHint(SDL_HINT_RENDER_DRIVER, "vulkan");
+#endif
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
@@ -64,6 +66,11 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         return SDL_APP_FAILURE;
     }
 
+	SDL_PropertiesID props = SDL_GetRendererProperties(renderer);
+	char* renderName = (char *)SDL_GetStringProperty(props, SDL_PROP_RENDERER_NAME_STRING, 0);
+
+	printf("render name: %s\n", renderName);
+
     SDL_SetRenderLogicalPresentation(renderer, 800, 600, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
     SDL_SetRenderVSync(renderer, 1);
@@ -74,6 +81,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
+
+bool showWireframe = false;
 
 /* This function runs when a new event (mouse input, keypresses, etc) occurs. */
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
@@ -89,6 +98,15 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
             return SDL_APP_SUCCESS;
         }
     }
+
+    if(event->type == SDL_EVENT_KEY_DOWN)
+    {
+        if(event->key.scancode == SDL_SCANCODE_1)
+        {
+			showWireframe = !showWireframe;
+        }
+    }
+
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
@@ -119,7 +137,6 @@ void printFPSInformation(SDL_Renderer* renderer, float deltaTime)
     
     snprintf(frameTimeText, 100, "frameTime: %.3f", deltaTime);
     SDL_RenderDebugText(renderer, 300, 20, frameTimeText);
-
 }
 
 SDL_AppResult SDL_AppIterate(void *appstate)
@@ -139,9 +156,21 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
     printFPSInformation(renderer, deltaTime);
 
-    SDL_RenderPresent(renderer);  /* put it all on the screen! */
+	
 
-    return SDL_APP_CONTINUE;  /* carry on with the program! */
+#ifndef FORCE_VULKAN
+
+#ifndef __EMSCRIPTEN__
+	if(showWireframe)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+#endif
+#endif
+    SDL_RenderPresent(renderer);
+
+    return SDL_APP_CONTINUE;
 }
 
 /* This function runs once at shutdown. */

@@ -13,7 +13,6 @@ class World: public GameObject
     Car* _car;
     BackGround* _backGround;
     PalomaSystem* _palomaSystem;
-    // MiddleLayer* _middleLayer;
 
     public:
         World(SDL_Renderer* renderer)
