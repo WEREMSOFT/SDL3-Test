@@ -73,15 +73,11 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 
     SDL_SetRenderLogicalPresentation(renderer, 800, 600, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-    SDL_SetRenderVSync(renderer, 1);
+    SDL_SetRenderVSync(renderer, 0);
 
     World* world = new World(renderer);
 
     *appstate = world;
-
-	GLint maxTexSize;
-	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTexSize);
-	printf("Max texture size: %d\n", maxTexSize);
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
