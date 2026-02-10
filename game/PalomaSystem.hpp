@@ -95,18 +95,12 @@ public:
 
 	void Draw(SDL_Renderer *renderer) override
 	{
-
 		DrawPalomasBatch(
-			Palomas, // array de Animal
+			Palomas,
 			renderer,
 			Texture,
 			Texture->w,
 			Texture->h);
-
-		// for (int i = 0; i < ENTITY_COUNT; i++)
-		// {
-		// 	DrawPaloma(&Palomas[i], renderer);
-		// }
 	}
 	// #########################################
 	void InitQuadIndices(void)
@@ -183,32 +177,27 @@ public:
 		int tex_w,
 		int tex_h)
 	{
-		// static bool firstFrame = true;
 		int quad_count = 0;
 
-		// if(!firstFrame)
-		// 	quad_count = ENTITY_COUNT;
-
 		/* --- sombras --- */
-		// if (firstFrame)
-			for (int i = 0; i < ENTITY_COUNT; i++)
-			{
-				Animal *p = &palomas[i];
+		for (int i = 0; i < ENTITY_COUNT; i++)
+		{
+			Animal *p = &palomas[i];
 
-				SDL_FRect pos = GetWorldPositionsPaloma(p);
-				pos.y += p->baseDifferenceY;
+			SDL_FRect pos = GetWorldPositionsPaloma(p);
+			pos.y += p->baseDifferenceY;
 
-				if (pos.x < -15 || pos.y < -15 || pos.x > 780 || pos.y > 680)
-					continue;
+			// if (pos.x < -15 || pos.y < -15 || pos.x > 780 || pos.y > 680)
+			// 	continue;
 
-				PushQuad(
-					quad_count++,
-					&pos,
-					&shadowSource,
-					0,
-					tex_w,
-					tex_h);
-			}
+			PushQuad(
+				quad_count++,
+				&pos,
+				&shadowSource,
+				0,
+				tex_w,
+				tex_h);
+		}
 
 		if (quad_count > 0)
 		{
@@ -223,25 +212,24 @@ public:
 
 		/* --- palomas --- */
 		quad_count = 0;
-		// if (firstFrame)
-			for (int i = 0; i < ENTITY_COUNT; i++)
-			{
-				Animal *p = &palomas[i];
+		for (int i = 0; i < ENTITY_COUNT; i++)
+		{
+			Animal *p = &palomas[i];
 
-				SDL_FRect pos = GetWorldPositionsPaloma(p);
-				if (pos.x < -15 || pos.y < -15 || pos.x > 780 || pos.y > 680)
-					continue;
+			SDL_FRect pos = GetWorldPositionsPaloma(p);
+			// if (pos.x < -15 || pos.y < -15 || pos.x > 780 || pos.y > 680)
+			// 	continue;
 
-				int flip = (p->direction.x < 0);
+			int flip = (p->direction.x < 0);
 
-				PushQuad(
-					quad_count++,
-					&pos,
-					&p->SourceRect,
-					flip,
-					tex_w,
-					tex_h);
-			}
+			PushQuad(
+				quad_count++,
+				&pos,
+				&p->SourceRect,
+				flip,
+				tex_w,
+				tex_h);
+		}
 
 		if (quad_count > 0)
 		{
@@ -253,7 +241,6 @@ public:
 				quad_count * 4,
 				g_idx, quad_count * 6, sizeof(Uint32));
 		}
-		// firstFrame = false;
 	}
 
 	// #########################################
