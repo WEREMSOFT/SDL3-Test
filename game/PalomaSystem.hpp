@@ -54,8 +54,6 @@ public:
 		shadowSource.w = 32;
 		shadowSource.h = 32;
 
-		qsort(Palomas, ENTITY_COUNT, sizeof(Animal), comparePaloma);
-
 		squirrelAnimations[(int)SquirrelAnimationEnum::IDLE_1].frames = 5;
 		squirrelAnimations[(int)SquirrelAnimationEnum::IDLE_2].frames = 5;
 		squirrelAnimations[(int)SquirrelAnimationEnum::IDLE_3].frames = 1;
@@ -102,7 +100,7 @@ public:
 			Texture->w,
 			Texture->h);
 	}
-	// #########################################
+
 	void InitQuadIndices(void)
 	{
 		for (int i = 0; i < MAX_QUADS; i++)
@@ -130,7 +128,6 @@ public:
 		int v = quad * 4;
 		int p = v * 2;
 
-		/* posiciones */
 		g_xy[p + 0] = dst->x;
 		g_xy[p + 1] = dst->y;
 
@@ -143,7 +140,6 @@ public:
 		g_xy[p + 6] = dst->x;
 		g_xy[p + 7] = dst->y + dst->h;
 
-		/* UVs */
 		float u0 = src->x / tex_w;
 		float v0 = src->y / tex_h;
 		float u1 = (src->x + src->w) / tex_w;
@@ -165,7 +161,6 @@ public:
 		g_uv[p + 6] = u0;
 		g_uv[p + 7] = v1;
 
-		/* color */
 		for (int i = 0; i < 4; i++)
 			g_col[v + i] = (SDL_FColor){1.0, 1.0, 1.0, 1.0};
 	}
@@ -179,7 +174,6 @@ public:
 	{
 		int quad_count = 0;
 
-		/* --- sombras --- */
 		for (int i = 0; i < ENTITY_COUNT; i++)
 		{
 			Animal *p = &palomas[i];
@@ -187,8 +181,8 @@ public:
 			SDL_FRect pos = GetWorldPositionsPaloma(p);
 			pos.y += p->baseDifferenceY;
 
-			// if (pos.x < -15 || pos.y < -15 || pos.x > 780 || pos.y > 680)
-			// 	continue;
+			if (pos.x < -15 || pos.y < -15 || pos.x > 780 || pos.y > 680)
+				continue;
 
 			PushQuad(
 				quad_count++,
@@ -210,15 +204,14 @@ public:
 				g_idx, quad_count * 6, sizeof(Uint32));
 		}
 
-		/* --- palomas --- */
 		quad_count = 0;
 		for (int i = 0; i < ENTITY_COUNT; i++)
 		{
 			Animal *p = &palomas[i];
 
 			SDL_FRect pos = GetWorldPositionsPaloma(p);
-			// if (pos.x < -15 || pos.y < -15 || pos.x > 780 || pos.y > 680)
-			// 	continue;
+			if (pos.x < -15 || pos.y < -15 || pos.x > 780 || pos.y > 680)
+				continue;
 
 			int flip = (p->direction.x < 0);
 
@@ -243,7 +236,6 @@ public:
 		}
 	}
 
-	// #########################################
 	static int comparePaloma(const void *a, const void *b)
 	{
 		const Animal *pa = (const Animal *)a;
@@ -254,36 +246,6 @@ public:
 		if (pa->Dimensions.y > pb->Dimensions.y)
 			return 1;
 		return 0;
-	}
-
-	void DrawPaloma(Animal *paloma, SDL_Renderer *renderer)
-	{
-		SDL_FRect worldPosition = GetWorldPositionsPaloma(paloma);
-
-		worldPosition.y += paloma->baseDifferenceY;
-
-		if (worldPosition.x < -15 || worldPosition.y < -15 || worldPosition.x > 780 || worldPosition.y > 680)
-			return;
-
-		SDL_RenderTexture(renderer, Texture, &shadowSource, &worldPosition);
-
-		worldPosition.y -= paloma->baseDifferenceY;
-
-		if (paloma->direction.x < 0)
-		{
-			SDL_RenderTextureRotated(
-				renderer,
-				Texture,
-				&paloma->SourceRect, // src rect (NULL = textura completa)
-				&worldPosition,
-				0.0,  // ángulo
-				NULL, // centro (NULL = centro del dst)
-				SDL_FLIP_HORIZONTAL);
-		}
-		else
-		{
-			SDL_RenderTexture(renderer, Texture, &paloma->SourceRect, &worldPosition);
-		}
 	}
 
 	SDL_FRect GetWorldPositionsPaloma(Animal *paloma)
