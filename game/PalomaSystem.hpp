@@ -8,7 +8,7 @@
 #include "Animal.hpp"
 #include "Piggeon.hpp"
 #include "Squirrel.hpp"
-
+#include <assert.h>
 #define ENTITY_COUNT 100001
 
 #define VERTS_PER_QUAD 4
@@ -17,6 +17,14 @@
 #define MAX_QUADS ENTITY_COUNT
 #define MAX_VERTS (MAX_QUADS * VERTS_PER_QUAD)
 #define MAX_IDXS (MAX_QUADS * INDICES_PER_QUAD)
+
+struct IndexSOA
+{
+	float g_xy[MAX_VERTS * 2];
+	float g_uv[MAX_VERTS * 2];
+	SDL_FColor g_col[MAX_VERTS];
+	Uint32 g_idx[MAX_IDXS];
+};
 
 class PalomaSystem : public GameObject
 {
@@ -27,10 +35,11 @@ class PalomaSystem : public GameObject
 
 	static float positions[ENTITY_COUNT * 2];
 
-	float g_xy[MAX_VERTS * 2];
-	float g_uv[MAX_VERTS * 2];
-	SDL_FColor g_col[MAX_VERTS];
-	Uint32 g_idx[MAX_IDXS];
+	IndexSOA palomasSOA = {0};
+	IndexSOA sombrasSOA = {0};
+
+	int textW;
+	int textH;
 
 public:
 	Animal *Palomas;
@@ -59,7 +68,10 @@ public:
 		squirrelAnimations[(int)SquirrelAnimationEnum::IDLE_3].frames = 1;
 		squirrelAnimations[(int)SquirrelAnimationEnum::FLYING].frames = 7;
 
-		InitQuadIndices();
+		InitQuadIndicesSOA();
+
+		textH = Texture->h;
+		textW = Texture->w;
 	}
 
 	~PalomaSystem()
@@ -93,31 +105,88 @@ public:
 
 	void Draw(SDL_Renderer *renderer) override
 	{
-		DrawPalomasBatch(
-			Palomas,
-			renderer,
-			Texture,
-			Texture->w,
-			Texture->h);
+		int quad_count = 0;
+
+		auto worldPosition = GetWorldPositionOffset();
+		SDL_FRect pos = {x: 0, y: 0, w: Palomas->Dimensions.w, h: Palomas->Dimensions.h};
+
+		for (int i = 0; i < ENTITY_COUNT; i++)
+		{
+			Animal *p = &Palomas[i];
+
+			pos.x = worldPosition.x + p->Dimensions.x;
+			pos.y = worldPosition.y + p->Dimensions.y;
+
+			if (pos.x < -15 || pos.y < -15 || pos.x > 780 || pos.y > 680)
+				continue;
+
+			int flip = (p->direction.x < 0);
+
+			PushQuadPaloma(
+				quad_count,
+				&pos,
+				&p->SourceRect,
+				flip,
+				textW,
+				textH);
+
+			pos.y += p->baseDifferenceY;
+
+			PushQuadSombras(
+				quad_count,
+				&pos,
+				&shadowSource,
+				0,
+				textW,
+				textH);
+
+			quad_count++;
+		}
+
+		if (quad_count > 0)
+		{
+			SDL_RenderGeometryRaw(
+				renderer, Texture,
+				sombrasSOA.g_xy, sizeof(float) * 2,
+				sombrasSOA.g_col, sizeof(SDL_FColor),
+				sombrasSOA.g_uv, sizeof(float) * 2,
+				quad_count * 4,
+				sombrasSOA.g_idx, quad_count * 6, sizeof(Uint32));
+
+			SDL_RenderGeometryRaw(
+				renderer, Texture,
+				palomasSOA.g_xy, sizeof(float) * 2,
+				palomasSOA.g_col, sizeof(SDL_FColor),
+				palomasSOA.g_uv, sizeof(float) * 2,
+				quad_count * 4,
+				palomasSOA.g_idx, quad_count * 6, sizeof(Uint32));
+		}
 	}
 
-	void InitQuadIndices(void)
+	void InitQuadIndicesSOA(void)
 	{
 		for (int i = 0; i < MAX_QUADS; i++)
 		{
 			Uint32 base = i * 4;
 			int o = i * 6;
 
-			g_idx[o + 0] = base + 0;
-			g_idx[o + 1] = base + 1;
-			g_idx[o + 2] = base + 2;
-			g_idx[o + 3] = base + 2;
-			g_idx[o + 4] = base + 3;
-			g_idx[o + 5] = base + 0;
+			palomasSOA.g_idx[o + 0] = base + 0;
+			palomasSOA.g_idx[o + 1] = base + 1;
+			palomasSOA.g_idx[o + 2] = base + 2;
+			palomasSOA.g_idx[o + 3] = base + 2;
+			palomasSOA.g_idx[o + 4] = base + 3;
+			palomasSOA.g_idx[o + 5] = base + 0;
+
+			sombrasSOA.g_idx[o + 0] = base + 0;
+			sombrasSOA.g_idx[o + 1] = base + 1;
+			sombrasSOA.g_idx[o + 2] = base + 2;
+			sombrasSOA.g_idx[o + 3] = base + 2;
+			sombrasSOA.g_idx[o + 4] = base + 3;
+			sombrasSOA.g_idx[o + 5] = base + 0;
 		}
 	}
-
-	inline void PushQuad(
+	
+	inline void PushQuadSombras(
 		int quad,
 		const SDL_FRect *dst,
 		const SDL_FRect *src,
@@ -128,17 +197,17 @@ public:
 		int v = quad * 4;
 		int p = v * 2;
 
-		g_xy[p + 0] = dst->x;
-		g_xy[p + 1] = dst->y;
+		sombrasSOA.g_xy[p + 0] = dst->x;
+		sombrasSOA.g_xy[p + 1] = dst->y;
 
-		g_xy[p + 2] = dst->x + dst->w;
-		g_xy[p + 3] = dst->y;
+		sombrasSOA.g_xy[p + 2] = dst->x + dst->w;
+		sombrasSOA.g_xy[p + 3] = dst->y;
 
-		g_xy[p + 4] = dst->x + dst->w;
-		g_xy[p + 5] = dst->y + dst->h;
+		sombrasSOA.g_xy[p + 4] = dst->x + dst->w;
+		sombrasSOA.g_xy[p + 5] = dst->y + dst->h;
 
-		g_xy[p + 6] = dst->x;
-		g_xy[p + 7] = dst->y + dst->h;
+		sombrasSOA.g_xy[p + 6] = dst->x;
+		sombrasSOA.g_xy[p + 7] = dst->y + dst->h;
 
 		float u0 = src->x / tex_w;
 		float v0 = src->y / tex_h;
@@ -152,20 +221,68 @@ public:
 			u1 = t;
 		}
 
-		g_uv[p + 0] = u0;
-		g_uv[p + 1] = v0;
-		g_uv[p + 2] = u1;
-		g_uv[p + 3] = v0;
-		g_uv[p + 4] = u1;
-		g_uv[p + 5] = v1;
-		g_uv[p + 6] = u0;
-		g_uv[p + 7] = v1;
+		sombrasSOA.g_uv[p + 0] = u0;
+		sombrasSOA.g_uv[p + 1] = v0;
+		sombrasSOA.g_uv[p + 2] = u1;
+		sombrasSOA.g_uv[p + 3] = v0;
+		sombrasSOA.g_uv[p + 4] = u1;
+		sombrasSOA.g_uv[p + 5] = v1;
+		sombrasSOA.g_uv[p + 6] = u0;
+		sombrasSOA.g_uv[p + 7] = v1;
 
 		for (int i = 0; i < 4; i++)
-			g_col[v + i] = (SDL_FColor){1.0, 1.0, 1.0, 1.0};
+			sombrasSOA.g_col[v + i] = (SDL_FColor){1.0, 1.0, 1.0, 1.0};
 	}
 
-	void DrawPalomasBatch(
+	inline void PushQuadPaloma(
+		int quad,
+		const SDL_FRect *dst,
+		const SDL_FRect *src,
+		int flip_x,
+		int tex_w,
+		int tex_h)
+	{
+		int v = quad * 4;
+		int p = v * 2;
+
+		palomasSOA.g_xy[p + 0] = dst->x;
+		palomasSOA.g_xy[p + 1] = dst->y;
+
+		palomasSOA.g_xy[p + 2] = dst->x + dst->w;
+		palomasSOA.g_xy[p + 3] = dst->y;
+
+		palomasSOA.g_xy[p + 4] = dst->x + dst->w;
+		palomasSOA.g_xy[p + 5] = dst->y + dst->h;
+
+		palomasSOA.g_xy[p + 6] = dst->x;
+		palomasSOA.g_xy[p + 7] = dst->y + dst->h;
+
+		float u0 = src->x / tex_w;
+		float v0 = src->y / tex_h;
+		float u1 = (src->x + src->w) / tex_w;
+		float v1 = (src->y + src->h) / tex_h;
+
+		if (flip_x)
+		{
+			float t = u0;
+			u0 = u1;
+			u1 = t;
+		}
+
+		palomasSOA.g_uv[p + 0] = u0;
+		palomasSOA.g_uv[p + 1] = v0;
+		palomasSOA.g_uv[p + 2] = u1;
+		palomasSOA.g_uv[p + 3] = v0;
+		palomasSOA.g_uv[p + 4] = u1;
+		palomasSOA.g_uv[p + 5] = v1;
+		palomasSOA.g_uv[p + 6] = u0;
+		palomasSOA.g_uv[p + 7] = v1;
+
+		for (int i = 0; i < 4; i++)
+			palomasSOA.g_col[v + i] = (SDL_FColor){1.0, 1.0, 1.0, 1.0};
+	}
+
+	void DrawPalomasBatchSOA(
 		Animal *palomas,
 		SDL_Renderer *renderer,
 		SDL_Texture *texture,
@@ -174,17 +291,32 @@ public:
 	{
 		int quad_count = 0;
 
+		auto worldPosition = GetWorldPositionOffset();
+		SDL_FRect pos = {x: 0, y: 0, w: palomas->Dimensions.w, h: palomas->Dimensions.h};
+
 		for (int i = 0; i < ENTITY_COUNT; i++)
 		{
 			Animal *p = &palomas[i];
 
-			SDL_FRect pos = GetWorldPositionsPaloma(p);
-			pos.y += p->baseDifferenceY;
+			pos.x = worldPosition.x + p->Dimensions.x;
+			pos.y = worldPosition.y + p->Dimensions.y;
 
 			if (pos.x < -15 || pos.y < -15 || pos.x > 780 || pos.y > 680)
 				continue;
 
-			PushQuad(
+			int flip = (p->direction.x < 0);
+
+			PushQuadPaloma(
+				quad_count++,
+				&pos,
+				&p->SourceRect,
+				flip,
+				tex_w,
+				tex_h);
+
+			pos.y += p->baseDifferenceY;
+
+			PushQuadSombras(
 				quad_count++,
 				&pos,
 				&shadowSource,
@@ -197,42 +329,19 @@ public:
 		{
 			SDL_RenderGeometryRaw(
 				renderer, texture,
-				g_xy, sizeof(float) * 2,
-				g_col, sizeof(SDL_FColor),
-				g_uv, sizeof(float) * 2,
+				sombrasSOA.g_xy, sizeof(float) * 2,
+				sombrasSOA.g_col, sizeof(SDL_FColor),
+				sombrasSOA.g_uv, sizeof(float) * 2,
 				quad_count * 4,
-				g_idx, quad_count * 6, sizeof(Uint32));
-		}
+				sombrasSOA.g_idx, quad_count * 6, sizeof(Uint32));
 
-		quad_count = 0;
-		for (int i = 0; i < ENTITY_COUNT; i++)
-		{
-			Animal *p = &palomas[i];
-
-			SDL_FRect pos = GetWorldPositionsPaloma(p);
-			if (pos.x < -15 || pos.y < -15 || pos.x > 780 || pos.y > 680)
-				continue;
-
-			int flip = (p->direction.x < 0);
-
-			PushQuad(
-				quad_count++,
-				&pos,
-				&p->SourceRect,
-				flip,
-				tex_w,
-				tex_h);
-		}
-
-		if (quad_count > 0)
-		{
 			SDL_RenderGeometryRaw(
 				renderer, texture,
-				g_xy, sizeof(float) * 2,
-				g_col, sizeof(SDL_FColor),
-				g_uv, sizeof(float) * 2,
+				palomasSOA.g_xy, sizeof(float) * 2,
+				palomasSOA.g_col, sizeof(SDL_FColor),
+				palomasSOA.g_uv, sizeof(float) * 2,
 				quad_count * 4,
-				g_idx, quad_count * 6, sizeof(Uint32));
+				palomasSOA.g_idx, quad_count * 6, sizeof(Uint32));
 		}
 	}
 
@@ -248,10 +357,10 @@ public:
 		return 0;
 	}
 
-	SDL_FRect GetWorldPositionsPaloma(Animal *paloma)
+	SDL_FRect GetWorldPositionOffset()
 	{
 		auto tempParent = Parent;
-		SDL_FRect worldPosition = {paloma->Dimensions.x, paloma->Dimensions.y, paloma->Dimensions.w, paloma->Dimensions.h};
+		SDL_FRect worldPosition = {0};
 		while (tempParent != nullptr)
 		{
 			worldPosition.x += tempParent->Dimensions.x;

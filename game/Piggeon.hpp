@@ -45,7 +45,7 @@ class Piggeon
                     paloma->Animation = (int)(random() % 2 == 0 ? PiggeonAnimationEnum::IDLE_1 : PiggeonAnimationEnum::IDLE_2);
                 }
 
-                if(distance < 100.)
+                if(distance < 50.)
                 {
                 	distanceV = Normalize(distanceV);
                     paloma->State = (int)State::FLYING;
