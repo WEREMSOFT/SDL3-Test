@@ -76,7 +76,7 @@ public:
 
 	~PalomaSystem()
 	{
-		free(Palomas);
+		// free(Palomas);
 	}
 
 	void Update(float deltaTime) override
@@ -112,25 +112,23 @@ public:
 
 		for (int i = 0; i < ENTITY_COUNT; i++)
 		{
-			Animal *p = &Palomas[i];
-
-			pos.x = worldPosition.x + p->Dimensions.x;
-			pos.y = worldPosition.y + p->Dimensions.y;
+			pos.x = worldPosition.x + Palomas[i].Dimensions.x;
+			pos.y = worldPosition.y + Palomas[i].Dimensions.y;
 
 			if (pos.x < -15 || pos.y < -15 || pos.x > 780 || pos.y > 680)
 				continue;
 
-			int flip = (p->direction.x < 0);
+			int flip = (Palomas[i].direction.x < 0);
 
 			PushQuadPaloma(
 				quad_count,
 				&pos,
-				&p->SourceRect,
+				&Palomas[i].SourceRect,
 				flip,
 				textW,
 				textH);
 
-			pos.y += p->baseDifferenceY;
+			pos.y += Palomas[i].baseDifferenceY;
 
 			PushQuadSombras(
 				quad_count,

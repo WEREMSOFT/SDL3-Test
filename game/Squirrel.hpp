@@ -20,7 +20,7 @@ class Squirrel
         squirrel->Dimensions.y = _car->Dimensions.y;
     }
 
-    static void Update(Animal* squirrel, float deltaTime, Car* _car, float elapsedFrametime, AnimationDefinition* squirrelAnimations)
+    static inline void Update(Animal* squirrel, float deltaTime, Car* _car, float elapsedFrametime, AnimationDefinition* squirrelAnimations)
     {
         static const int FrameStart = 128 + 32;
         squirrel->elapsedIddleTime += deltaTime;
