@@ -10,8 +10,10 @@ class Car: public MovingGameObject
     static constexpr float TWO_PI = 2. * M_PI;
     static const int NUM_FRAMES = 16;
     SDL_FRect _prevDimensions = {0};
-
+	
     public:
+		bool honk = false;
+
         Car(SDL_Renderer* renderer)
         {
             Tag = "Car";
@@ -39,7 +41,7 @@ class Car: public MovingGameObject
 
             Texture = SDL_CreateTextureFromSurface(renderer, surface);
 
-            AddChild(new KeyboardBehavior());
+            AddChild(new KeyboardBehavior(&honk));
 
             SDL_DestroySurface(surface);
         }

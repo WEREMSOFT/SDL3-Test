@@ -5,13 +5,17 @@
 #include "MovingGameObject.hpp"
 #include "../core/Vector2.hpp"
 
+class Car;
+
 #include <SDL3/SDL.h>
 
 class KeyboardBehavior: public GameObject
 {
+	bool* _honk;
     public:
-        KeyboardBehavior()
+        KeyboardBehavior(bool* honk)
         {
+			_honk = honk;
             Type = GameObjectTypeEnum::BEHAVIOR;
             Tag = "Keyboard Behavior";
         }
@@ -20,6 +24,7 @@ class KeyboardBehavior: public GameObject
         {
             Vector2f direction = { 0, 1. };
             GameObject::Update(deltaTime);
+			auto car = (Car*)Parent;
 
             auto movingParent = (MovingGameObject*)Parent;
 
@@ -55,5 +60,11 @@ class KeyboardBehavior: public GameObject
                 Parent->Dimensions.x += vecIncrement.x;
                 Parent->Dimensions.y += vecIncrement.y;
             }
+
+			if (keys[SDL_SCANCODE_H]) {
+				*_honk = true;
+            } else {
+				*_honk = false;
+			}
         }
 };

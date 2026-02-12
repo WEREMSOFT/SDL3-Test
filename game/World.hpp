@@ -70,13 +70,13 @@ class World: public GameObject
         {
             GameObject::Draw(renderer);
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  /* white, full alpha */
-            SDL_RenderDebugText(renderer, 0, 0, "WASD to accelerate, break and turn.");
-            SDL_RenderDebugText(renderer, 0, 20, "Esc to quit(on desktop)");
+            SDL_RenderDebugText(renderer, 0, 0, "Esc to quit(on desktop)");
+            SDL_RenderDebugText(renderer, 0, 40, "WASD to accelerate, break and turn. H for horn.");
             SDL_RenderDebugText(renderer, 0, 60, "Try to herd the squirrel to the LEFT through the piggeons.");
 
             char carPositionText[300] = {0};
             snprintf(carPositionText, 300, "Car Position: %.2f, %.2f", _car->Dimensions.x, _car->Dimensions.y);
 
-            SDL_RenderDebugText(renderer, 0, 40, carPositionText);
+            SDL_RenderDebugText(renderer, 0, 20, carPositionText);
         }
 };
