@@ -45,7 +45,7 @@ class Squirrel
                     squirrel->Animation = (int)(random() % 2 == 0 ? SquirrelAnimationEnum::IDLE_1 : SquirrelAnimationEnum::IDLE_3);
                 }
 
-  	            if(distance < (_car->honk?60.:50.))
+  	            if(distance < (_car->honk?120.:50.))
                 {
                 	distanceV = Normalize(distanceV);
                     squirrel->State = (int)State::FLYING;
