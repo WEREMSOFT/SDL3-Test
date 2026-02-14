@@ -76,7 +76,7 @@ public:
 
 	~PalomaSystem()
 	{
-		// free(Palomas);
+		free(Palomas);
 	}
 
 	void Update(float deltaTime) override
@@ -106,6 +106,7 @@ public:
 	void Draw(SDL_Renderer *renderer) override
 	{
 		int quad_count = 0;
+		int sombra_quad_count = 0;
 
 		auto worldPosition = GetWorldPositionOffset();
 		SDL_FRect pos = {x: 0, y: 0, w: Palomas->Dimensions.w, h: Palomas->Dimensions.h};
@@ -128,29 +129,38 @@ public:
 				textW,
 				textH);
 
-			pos.y += Palomas[i].baseDifferenceY;
+				
+			if(Palomas[i].baseDifferenceY > 0)
+			{
+				pos.y += Palomas[i].baseDifferenceY;
+				PushQuadSombras(
+					sombra_quad_count,
+					&pos,
+					&shadowSource,
+					0,
+					textW,
+					textH);
 
-			PushQuadSombras(
-				quad_count,
-				&pos,
-				&shadowSource,
-				0,
-				textW,
-				textH);
+				sombra_quad_count++;
+			}
 
 			quad_count++;
 		}
 
-		if (quad_count > 0)
+		if(sombra_quad_count > 0)
 		{
 			SDL_RenderGeometryRaw(
 				renderer, Texture,
 				sombrasSOA.g_xy, sizeof(float) * 2,
 				sombrasSOA.g_col, sizeof(SDL_FColor),
 				sombrasSOA.g_uv, sizeof(float) * 2,
-				quad_count * 4,
-				sombrasSOA.g_idx, quad_count * 6, sizeof(Uint32));
+				sombra_quad_count * 4,
+				sombrasSOA.g_idx, sombra_quad_count * 6, sizeof(Uint32));
+		}
 
+
+		if (quad_count > 0)
+		{
 			SDL_RenderGeometryRaw(
 				renderer, Texture,
 				palomasSOA.g_xy, sizeof(float) * 2,

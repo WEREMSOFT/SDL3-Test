@@ -34,7 +34,7 @@ class Piggeon
             paloma->baseY = paloma->Dimensions.y;
         }
 
-        distanceV = (Vector2f){ paloma->Dimensions.x - (_car->Dimensions.x + _car->Dimensions.w * .5f), paloma->Dimensions.y - (_car->Dimensions.y + _car->Dimensions.h * .5f) };
+        distanceV = (Vector2f){ paloma->Dimensions.x - (_car->Dimensions.x + _car->Dimensions.w * .3f), paloma->Dimensions.y - (_car->Dimensions.y + _car->Dimensions.h * .3f) };
         distance = Length(distanceV);
 
         switch (paloma->State) {
