@@ -82,13 +82,39 @@ public:
 	void Update(float deltaTime) override
 	{
 		elapsedFrametime += deltaTime;
+		Animal* paloma;
+		static int palomaSkip = 0;
 
+		palomaSkip++;
+
+		palomaSkip %= 4;
+
+		auto worldPosition = GetWorldPositionOffset();
+		SDL_FRect pos = {x: 0, y: 0, w: Palomas->Dimensions.w, h: Palomas->Dimensions.h};
+		
+		
 		for (int i = 0; i < ENTITY_COUNT; i++)
 		{
+			pos.x = worldPosition.x + Palomas[i].Dimensions.x;
+			pos.y = worldPosition.y + Palomas[i].Dimensions.y;
+
+			if (pos.x < -15 || pos.y < -15 || pos.x > 780 || pos.y > 680)
+				continue;
+		
 			switch (Palomas[i].Type)
 			{
 			case AnimalTypeEnum::Piggeon:
-				Piggeon::Update(&Palomas[i], deltaTime, _car, elapsedFrametime);
+				paloma = &Palomas[i];
+				Piggeon::UpdateAnimation(paloma, deltaTime, elapsedFrametime);
+
+		        switch (paloma->State) 
+		        {
+		            case int(State::IDLE):
+	            		Piggeon::UpdateStateIdle(paloma, _car);
+		                break;
+		            case (int)State::FLYING:
+		            	Piggeon::UpdateStateFlying(paloma, deltaTime);
+		        }
 				break;
 			case AnimalTypeEnum::Squirrel:
 				Squirrel::Update(&Palomas[i], deltaTime, _car, elapsedFrametime, squirrelAnimations);
